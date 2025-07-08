@@ -123,11 +123,12 @@
 <script src="{{ l5_swagger_asset($documentation, 'swagger-ui-standalone-preset.js') }}"></script>
 <script>
     window.onload = function() {
-        const urls = [];
-
-        @foreach($urlsToDocs as $title => $url)
-            urls.push({name: "{{ $title }}", url: "{{ $url }}"});
-        @endforeach
+        const urls = [
+                        {
+                            name: "Find My MUA API",
+                            url: "https://findmymua-production.up.railway.app/docs/api-docs.json"
+                        }
+                    ];
 
         // Build a system
         const ui = SwaggerUIBundle({
