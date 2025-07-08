@@ -6,6 +6,7 @@ return [
         'default' => [
             'api' => [
                 'title' => 'L5 Swagger UI',
+                'docs_url' => '/docs/api-docs.json',
             ],
 
             'routes' => [
@@ -83,6 +84,7 @@ return [
              * Absolute path to location where parsed annotations will be stored
              */
             'docs' => public_path('docs'),
+            'docs_json' => 'api-docs.json',
 
             /*
              * Absolute path to directory where to export views
