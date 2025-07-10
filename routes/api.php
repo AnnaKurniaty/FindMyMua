@@ -91,7 +91,7 @@ Route::middleware(['auth:sanctum', 'customer'])->prefix('customer')->group(funct
 Route::middleware(['auth:sanctum', 'mua'])->prefix('mua')->group(function () {
     Route::get('/profile', [MuaProfileController::class, 'show']);
     Route::put('/profile', [MuaProfileController::class, 'update']);
-    Route::post('/profile', [ProfileController::class, 'store']);
+    Route::post('/profile', [MuaProfileController::class, 'store']);
 });
 
 
