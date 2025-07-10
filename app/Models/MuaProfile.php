@@ -21,12 +21,14 @@ class MuaProfile extends Model
         'available_days',
         'available_start_time',
         'available_end_time',
-        'profile_photo'
+        'profile_photo',
+        'skin_type'
     ];
 
     protected $casts = [
         'makeup_styles' => 'array',
         'makeup_specializations' => 'array',
+        'skin_type' => 'array',
         'available_days' => 'array',
     ];
 

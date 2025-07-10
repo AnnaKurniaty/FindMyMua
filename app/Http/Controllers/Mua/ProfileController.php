@@ -33,6 +33,7 @@ use App\Models\User;
  *             @OA\Property(property="studio_lng", type="number"),
  *             @OA\Property(property="makeup_styles", type="array", @OA\Items(type="string")),
  *             @OA\Property(property="makeup_specializations", type="array", @OA\Items(type="string")),
+ *             @OA\Property(property="skin_type", type="string", description="JSON array"),
  *             @OA\Property(property="available_days", type="array", @OA\Items(type="string")),
  *             @OA\Property(property="available_start_time", type="string", example="08:00:00"),
  *             @OA\Property(property="available_end_time", type="string", example="17:00:00")
@@ -59,6 +60,7 @@ use App\Models\User;
  *                 @OA\Property(property="studio_lng", type="number"),
  *                 @OA\Property(property="makeup_styles", type="string", description="JSON array"),
  *                 @OA\Property(property="makeup_specializations", type="string", description="JSON array"),
+ *                 @OA\Property(property="skin_type", type="string", description="JSON array"),
  *                 @OA\Property(property="available_days", type="string", description="JSON array"),
  *                 @OA\Property(property="available_start_time", type="string", format="time"),
  *                 @OA\Property(property="available_end_time", type="string", format="time"),
@@ -98,6 +100,7 @@ class ProfileController extends Controller
             'studio_lng' => 'nullable|numeric',
             'makeup_styles' => 'nullable|json',
             'makeup_specializations' => 'nullable|json',
+            'skin_type' => 'nullable|json',
             'available_days' => 'nullable|json',
             'available_start_time' => 'nullable|date_format:H:i:s',
             'available_end_time' => 'nullable|date_format:H:i:s',
@@ -113,7 +116,7 @@ class ProfileController extends Controller
         }
 
         // Decode JSON string inputs to arrays
-        foreach (['makeup_styles', 'makeup_specializations', 'available_days'] as $field) {
+        foreach (['makeup_styles', 'makeup_specializations', 'available_days', 'skin_type'] as $field) {
             if (isset($data[$field]) && is_string($data[$field])) {
                 $data[$field] = json_decode($data[$field], true);
             }
@@ -137,6 +140,7 @@ class ProfileController extends Controller
             'studio_lng' => 'nullable|numeric',
             'makeup_styles' => 'nullable|array',
             'makeup_specializations' => 'nullable|array',
+            'skin_type' => 'nullable|array',
             'available_days' => 'nullable|array',
             'available_start_time' => 'nullable|date_format:H:i:s',
             'available_end_time' => 'nullable|date_format:H:i:s',
