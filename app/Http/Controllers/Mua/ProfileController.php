@@ -115,7 +115,6 @@ class ProfileController extends Controller
             $data['profile_photo'] = Storage::url($path);
         }
 
-        // Decode JSON string inputs to arrays
         foreach (['makeup_styles', 'makeup_specializations', 'available_days', 'skin_type'] as $field) {
             if (isset($data[$field]) && is_string($data[$field])) {
                 $data[$field] = json_decode($data[$field], true);
