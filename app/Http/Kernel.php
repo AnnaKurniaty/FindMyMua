@@ -36,6 +36,7 @@ class Kernel extends HttpKernel
             \Illuminate\Http\Middleware\HandleCors::class,
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Fruitcake\Cors\HandleCors::class,
         ],
     ];
 

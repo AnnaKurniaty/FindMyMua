@@ -6,38 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Wishlist;
 
-/**
- * @OA\Get(
- *     path="/api/customer/wishlist",
- *     summary="Lihat daftar MUA favorit customer",
- *     tags={"Wishlist"},
- *     security={{"bearerAuth":{}}},
- *     @OA\Response(response=200, description="Wishlist dikembalikan")
- * )
- *
- * @OA\Post(
- *     path="/api/customer/wishlist",
- *     summary="Tambahkan MUA ke wishlist",
- *     tags={"Wishlist"},
- *     security={{"bearerAuth":{}}},
- *     @OA\RequestBody(
- *         @OA\JsonContent(
- *             @OA\Property(property="mua_id", type="integer", example=10)
- *         )
- *     ),
- *     @OA\Response(response=201, description="Ditambahkan")
- * )
- *
- * @OA\Delete(
- *     path="/api/customer/wishlist/{mua_id}",
- *     summary="Hapus MUA dari wishlist",
- *     tags={"Wishlist"},
- *     security={{"bearerAuth":{}}},
- *     @OA\Parameter(name="mua_id", in="path", required=true, @OA\Schema(type="integer")),
- *     @OA\Response(response=200, description="Dihapus")
- * )
- */
-
 class WishlistController extends Controller
 {
     public function index()

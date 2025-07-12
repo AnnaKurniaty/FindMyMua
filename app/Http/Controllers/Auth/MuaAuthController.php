@@ -10,27 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class MuaAuthController extends Controller
 {
-    /**
- * @OA\Post(
- *     path="/api/auth/register/mua",
- *     summary="Registrasi akun MUA",
- *     tags={"Auth"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"name", "email", "password", "password_confirmation"},
- *             @OA\Property(property="name", type="string", example="MUA Rina"),
- *             @OA\Property(property="email", type="string", format="email", example="rina@example.com"),
- *             @OA\Property(property="phone", type="string", example="08123456789"),
- *             @OA\Property(property="password", type="string", example="secret123"),
- *             @OA\Property(property="password_confirmation", type="string", example="secret123")
- *         )
- *     ),
- *     @OA\Response(response=201, description="MUA registered successfully"),
- *     @OA\Response(response=422, description="Validation error")
- * )
- */
-
     public function register(Request $request)
     {
         $request->validate([
@@ -58,32 +37,6 @@ class MuaAuthController extends Controller
         ]);
     }
 
-    /**
- * @OA\Post(
- *     path="/api/auth/login/mua",
- *     summary="Login untuk MUA",
- *     tags={"Auth"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"email", "password"},
- *             @OA\Property(property="email", type="string", format="email", example="rina@example.com"),
- *             @OA\Property(property="password", type="string", example="secret123")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Login berhasil",
- *         @OA\JsonContent(
- *             @OA\Property(property="access_token", type="string"),
- *             @OA\Property(property="token_type", type="string", example="Bearer"),
- *             @OA\Property(property="user", type="object")
- *         )
- *     ),
- *     @OA\Response(response=401, description="Invalid credentials / unauthorized")
- * )
- */
-
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -106,4 +59,14 @@ class MuaAuthController extends Controller
 
         return response()->json(['error' => 'Invalid credentials'], 401);
     }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logout berhasil'
+        ]);
+    }
+
 }

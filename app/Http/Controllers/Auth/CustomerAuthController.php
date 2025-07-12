@@ -10,37 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class CustomerAuthController extends Controller
 {
-    /**
- * @OA\Post(
- *     path="/api/auth/register/customer",
- *     summary="Register akun customer",
- *     tags={"Auth"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\MediaType(
- *             mediaType="multipart/form-data",
- *             @OA\Schema(
- *                 required={"name", "email", "password", "password_confirmation", "skin_tone", "skin_type"},
- *                 @OA\Property(property="name", type="string", example="Anna"),
- *                 @OA\Property(property="email", type="string", format="email", example="anna@example.com"),
- *                 @OA\Property(property="phone", type="string", example="08123456789"),
- *                 @OA\Property(property="password", type="string", example="secret123"),
- *                 @OA\Property(property="password_confirmation", type="string", example="secret123"),
- *                 @OA\Property(property="skin_tone", type="string", example="sawo matang"),
- *                 @OA\Property(property="skin_type", type="string", example="berminyak"),
- *                 @OA\Property(property="skin_issues[]", type="array", @OA\Items(type="string"), example={"jerawat", "kering"}),
- *                 @OA\Property(property="skincare_history", type="string", example="The Ordinary, Hada Labo"),
- *                 @OA\Property(property="allergies", type="string", example="Fragrance, Alcohol"),
- *                 @OA\Property(property="makeup_preferences", type="string", example="natural, dewy"),
- *                 @OA\Property(property="profile_photo", type="string", format="binary")
- *             )
- *         )
- *     ),
- *     @OA\Response(response=201, description="Customer registered with skin profile"),
- *     @OA\Response(response=422, description="Validasi gagal")
- * )
- */
-
     public function register(Request $request)
     {
         $request->validate([
@@ -49,7 +18,6 @@ class CustomerAuthController extends Controller
             'phone'    => 'nullable|string',
             'password' => 'required|min:6|confirmed',
 
-            // Profil kulit
             'skin_tone'            => 'required|string',
             'skin_type'            => 'required|string',
             'skin_issues'          => 'nullable|array',
@@ -68,7 +36,6 @@ class CustomerAuthController extends Controller
             'role'     => 'customer',
         ]);
 
-        // Upload profil photo jika ada
         $photoPath = null;
         if ($request->hasFile('profile_photo')) {
             $photoPath = $request->file('profile_photo')->store('profiles', 'public');
@@ -90,32 +57,6 @@ class CustomerAuthController extends Controller
             'user'    => $user
         ]);
     }
-
-    /**
- * @OA\Post(
- *     path="/api/auth/login/customer",
- *     summary="Login untuk Customer",
- *     tags={"Auth"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"email", "password"},
- *             @OA\Property(property="email", type="string", format="email", example="anna@example.com"),
- *             @OA\Property(property="password", type="string", example="secret123")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Login berhasil",
- *         @OA\JsonContent(
- *             @OA\Property(property="access_token", type="string"),
- *             @OA\Property(property="token_type", type="string", example="Bearer"),
- *             @OA\Property(property="user", type="object")
- *         )
- *     ),
- *     @OA\Response(response=401, description="Invalid credentials / unauthorized")
- * )
- */
 
     public function login(Request $request)
     {

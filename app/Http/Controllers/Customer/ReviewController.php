@@ -7,23 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Booking;
 use App\Models\Review;
 
-/**
- * @OA\Post(
- *     path="/api/customer/reviews",
- *     summary="Customer menulis review setelah booking selesai",
- *     tags={"Review"},
- *     security={{"bearerAuth":{}}},
- *     @OA\RequestBody(
- *         @OA\JsonContent(
- *             @OA\Property(property="booking_id", type="integer", example=7),
- *             @OA\Property(property="rating", type="integer", example=5),
- *             @OA\Property(property="comment", type="string", example="Hasil makeup bagus dan awet!")
- *         )
- *     ),
- *     @OA\Response(response=201, description="Review disimpan")
- * )
- */
-
 class ReviewController extends Controller
 {
     public function store(Request $request)

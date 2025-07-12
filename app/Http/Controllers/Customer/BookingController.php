@@ -8,33 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Helpers\NotifyHelper;
 
-/**
- * @OA\Get(
- *     path="/api/customer/bookings",
- *     summary="Lihat semua booking milik customer",
- *     tags={"Booking"},
- *     security={{"bearerAuth":{}}},
- *     @OA\Response(response=200, description="Daftar booking")
- * )
- *
- * @OA\Post(
- *     path="/api/customer/bookings",
- *     summary="Buat booking baru",
- *     tags={"Booking"},
- *     security={{"bearerAuth":{}}},
- *     @OA\RequestBody(
- *         @OA\JsonContent(
- *             @OA\Property(property="mua_id", type="integer", example=5),
- *             @OA\Property(property="service_id", type="integer", example=3),
- *             @OA\Property(property="date", type="string", format="date", example="2025-07-01"),
- *             @OA\Property(property="time", type="string", example="14:00"),
- *             @OA\Property(property="payment_method", type="string", example="transfer")
- *         )
- *     ),
- *     @OA\Response(response=201, description="Booking berhasil dibuat")
- * )
- */
-
 class BookingController extends Controller
 {
     public function index()

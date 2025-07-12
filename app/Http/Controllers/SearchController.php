@@ -6,25 +6,12 @@ use Illuminate\Http\Request;
 use App\Models\MuaProfile;
 use App\Models\User;
 
-/**
- * @OA\Get(
- *     path="/api/mua/search",
- *     summary="Cari MUA berdasarkan gaya, spesialisasi, harga",
- *     tags={"Search"},
- *     @OA\Parameter(name="style", in="query", required=false, @OA\Schema(type="string")),
- *     @OA\Parameter(name="specialization", in="query", required=false, @OA\Schema(type="string")),
- *     @OA\Parameter(name="min_price", in="query", required=false, @OA\Schema(type="integer")),
- *     @OA\Parameter(name="max_price", in="query", required=false, @OA\Schema(type="integer")),
- *     @OA\Response(response=200, description="Hasil pencarian")
- * )
- */
-
 class SearchController extends Controller
 {
     public function index(Request $request)
     {
-        $style     = $request->query('style'); // natural, bold
-        $spec      = $request->query('specialization'); // bridal
+        $style     = $request->query('style');
+        $spec      = $request->query('specialization');
         $minPrice  = $request->query('min_price');
         $maxPrice  = $request->query('max_price');
 

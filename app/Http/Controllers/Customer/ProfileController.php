@@ -5,30 +5,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-/**
- * @OA\Get(
- *     path="/api/customer/profile",
- *     summary="Lihat profil customer",
- *     tags={"Profile"},
- *     security={{"bearerAuth":{}}},
- *     @OA\Response(response=200, description="Profil customer dikembalikan")
- * )
- *
- * @OA\Put(
- *     path="/api/customer/profile",
- *     summary="Update profil customer",
- *     tags={"Profile"},
- *     security={{"bearerAuth":{}}},
- *     @OA\RequestBody(
- *         @OA\JsonContent(
- *             @OA\Property(property="skin_tone", type="string", example="sawo matang"),
- *             @OA\Property(property="skin_type", type="string", example="berminyak"),
- *             @OA\Property(property="makeup_preferences", type="string", example="natural, matte")
- *         )
- *     ),
- *     @OA\Response(response=200, description="Profil diperbarui")
- * )
- */
 class ProfileController extends Controller
 {
     public function show()

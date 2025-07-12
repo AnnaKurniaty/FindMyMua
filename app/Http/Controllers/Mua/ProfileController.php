@@ -90,43 +90,61 @@ class ProfileController extends Controller
 
     public function store(Request $request)
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        $request->validate([
-            'bio' => 'nullable|string',
-            'certification' => 'nullable|string',
-            'service_area' => 'nullable|string',
-            'studio_lat' => 'nullable|numeric',
-            'studio_lng' => 'nullable|numeric',
-            'makeup_styles' => 'nullable|json',
-            'makeup_specializations' => 'nullable|json',
-            'skin_type' => 'nullable|json',
-            'available_days' => 'nullable|json',
-            'available_start_time' => 'nullable|date_format:H:i:s',
-            'available_end_time' => 'nullable|date_format:H:i:s',
-            'profile_photo' => 'nullable|image|max:2048',
-        ]);
+            $request->validate([
+                'bio' => 'nullable|string',
+                'certification' => 'nullable|string',
+                'service_area' => 'nullable|string',
+                'studio_lat' => 'nullable|numeric',
+                'studio_lng' => 'nullable|numeric',
+                'makeup_styles' => 'nullable|json',
+                'makeup_specializations' => 'nullable|json',
+                'skin_type' => 'nullable|json',
+                'available_days' => 'nullable|json',
+                'available_start_time' => 'nullable',
+                'available_end_time' => 'nullable',
+                'profile_photo' => 'nullable|image|max:2048',
+            ]);
 
-        $data = $request->except(['profile_photo']);
-        $data['user_id'] = $user->id;
+            $data = $request->only([
+                'bio',
+                'certification',
+                'service_area',
+                'studio_lat',
+                'studio_lng',
+                'makeup_styles',
+                'makeup_specializations',
+                'skin_type',
+                'available_days',
+                'available_start_time',
+                'available_end_time'
+            ]);
 
-        if ($request->hasFile('profile_photo')) {
-            $path = $request->file('profile_photo')->store('public/profile_photos');
-            $data['profile_photo'] = Storage::url($path);
-        }
+            $data['user_id'] = $user->id;
 
-        foreach (['makeup_styles', 'makeup_specializations', 'available_days', 'skin_type'] as $field) {
-            if (isset($data[$field]) && is_string($data[$field])) {
-                $data[$field] = json_decode($data[$field], true);
+            if ($request->hasFile('profile_photo')) {
+                $path = $request->file('profile_photo')->store('public/profile_photos');
+                $data['profile_photo'] = \Storage::url($path);
             }
+
+            foreach (['makeup_styles', 'makeup_specializations', 'available_days', 'skin_type', 'certification'] as $field) {
+                if (isset($data[$field]) && is_string($data[$field])) {
+                    $data[$field] = json_decode($data[$field], true);
+                }
+            }
+
+            $profile = MuaProfile::create($data);
+
+            return response()->json([
+                'message' => 'MUA profile created',
+                'data' => $profile
+            ], 201);
+        } catch (\Throwable $e) {
+            \Log::error('MUA PROFILE STORE ERROR', ['error' => $e->getMessage()]);
+            return response()->json(['message' => 'Failed to create profile', 'error' => $e->getMessage()], 500);
         }
-
-        $profile = MuaProfile::create($data);
-
-        return response()->json([
-            'message' => 'MUA profile created',
-            'data' => $profile
-        ], 201);
     }
 
     public function update(Request $request)
@@ -162,7 +180,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function public($id)
+    public function index($id)
     {
         $user = User::where('id', $id)
             ->where('role', 'mua')

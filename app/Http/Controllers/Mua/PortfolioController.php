@@ -54,11 +54,10 @@ class PortfolioController extends Controller
     {
         $request->validate([
             'media_type' => 'required|in:image,video',
-            'file'       => 'required|file|max:10240', // max 10MB
+            'file'       => 'required|file|max:10240',
             'caption'    => 'nullable|string'
         ]);
 
-        // Simpan file
         $path = $request->file('file')->store('portfolios', 'public');
 
         $item = Portfolio::create([

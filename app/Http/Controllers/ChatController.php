@@ -8,31 +8,6 @@ use App\Models\Chat;
 use App\Models\Booking;
 use App\Helpers\NotifyHelper;
 
-/**
- * @OA\Get(
- *     path="/api/chat/{booking_id}",
- *     summary="Ambil pesan chat booking",
- *     tags={"Chat"},
- *     security={{"bearerAuth":{}}},
- *     @OA\Parameter(name="booking_id", in="path", required=true, @OA\Schema(type="integer")),
- *     @OA\Response(response=200, description="Daftar pesan chat")
- * )
- *
- * @OA\Post(
- *     path="/api/chat/{booking_id}",
- *     summary="Kirim pesan chat",
- *     tags={"Chat"},
- *     security={{"bearerAuth":{}}},
- *     @OA\Parameter(name="booking_id", in="path", required=true, @OA\Schema(type="integer")),
- *     @OA\RequestBody(
- *         @OA\JsonContent(
- *             @OA\Property(property="message", type="string", example="Halo Kak, lokasi kita di mana ya?")
- *         )
- *     ),
- *     @OA\Response(response=200, description="Pesan terkirim")
- * )
- */
-
 class ChatController extends Controller
 {
     public function index($booking_id)
@@ -72,7 +47,6 @@ class ChatController extends Controller
             'message' => $request->message,
         ]);
 
-        // 🔔 Kirim notifikasi ke lawan bicara
         $receiver_id = Auth::id() === $booking->customer_id
             ? $booking->mua_id
             : $booking->customer_id;
