@@ -1,36 +1,11 @@
 <?php
+
 namespace App\Http\Controllers\Mua;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
-
-/**
- * @OA\Get(
- *     path="/api/mua/services",
- *     summary="Lihat semua layanan MUA",
- *     tags={"Service"},
- *     security={{"bearerAuth":{}}},
- *     @OA\Response(response=200, description="List layanan")
- * )
- *
- * @OA\Post(
- *     path="/api/mua/services",
- *     summary="Buat layanan baru",
- *     tags={"Service"},
- *     security={{"bearerAuth":{}}},
- *     @OA\RequestBody(
- *         @OA\JsonContent(
- *             @OA\Property(property="name", type="string", example="Wedding Makeup"),
- *             @OA\Property(property="price", type="number", example=1500000),
- *             @OA\Property(property="duration_minutes", type="integer", example=90),
- *             @OA\Property(property="location_type", type="string", example="home")
- *         )
- *     ),
- *     @OA\Response(response=201, description="Layanan berhasil dibuat")
- * )
- */
 
 class ServiceController extends Controller
 {
@@ -43,23 +18,23 @@ class ServiceController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'                => 'required|string',
-            'description'         => 'nullable|string',
-            'price'               => 'required|numeric|min:0',
-            'duration_minutes'    => 'required|integer|min:1',
-            'location_type'       => 'required|in:studio,home',
-            'cancellation_policy' => 'nullable|string'
+            'name'         => 'required|string|max:255',
+            'description'  => 'nullable|string',
+            'price'        => 'required|numeric|min:0',
+            'duration'     => 'required|string|max:50',
+            'photo'        => 'nullable|image|max:2048',
+            'makeup_style' => 'nullable|string|max:100',
         ]);
 
-        $service = Service::create([
-            'mua_id'              => Auth::id(),
-            'name'                => $request->name,
-            'description'         => $request->description,
-            'price'               => $request->price,
-            'duration_minutes'    => $request->duration_minutes,
-            'location_type'       => $request->location_type,
-            'cancellation_policy' => $request->cancellation_policy,
-        ]);
+        $data = $request->only(['name', 'description', 'price', 'duration', 'makeup_style']);
+        $data['mua_id'] = Auth::id();
+
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('public/service_photos');
+            $data['photo'] = asset(str_replace('public', 'storage', $path));
+        }
+
+        $service = Service::create($data);
 
         return response()->json([
             'message' => 'Service created successfully',
@@ -72,18 +47,25 @@ class ServiceController extends Controller
         $service = Service::where('id', $id)->where('mua_id', Auth::id())->firstOrFail();
 
         $request->validate([
-            'name'                => 'required|string',
-            'description'         => 'nullable|string',
-            'price'               => 'required|numeric|min:0',
-            'duration_minutes'    => 'required|integer|min:1',
-            'location_type'       => 'required|in:studio,home',
-            'cancellation_policy' => 'nullable|string'
+            'name'         => 'required|string|max:255',
+            'description'  => 'nullable|string',
+            'price'        => 'required|numeric|min:0',
+            'duration'     => 'required|string|max:50',
+            'photo'        => 'nullable|image|max:2048',
+            'makeup_style' => 'nullable|string|max:100',
         ]);
 
-        $service->update($request->all());
+        $data = $request->only(['name', 'description', 'price', 'duration', 'makeup_style']);
+
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('public/service_photos');
+            $data['photo'] = asset(str_replace('public', 'storage', $path));
+        }
+
+        $service->update($data);
 
         return response()->json([
-            'message' => 'Service updated',
+            'message' => 'Service updated successfully',
             'service' => $service
         ]);
     }

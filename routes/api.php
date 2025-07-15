@@ -38,12 +38,12 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware('auth:sanctum')->post('/logout/mua', [MuaAuthController::class, 'logout']);
 
-// Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
-//     Route::get('/services', [ServiceController::class, 'index']);
-//     Route::post('/services', [ServiceController::class, 'store']);
-//     Route::put('/services/{id}', [ServiceController::class, 'update']);
-//     Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
-// });
+Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
+    Route::get('/services', [ServiceController::class, 'index']);
+    Route::post('/services', [ServiceController::class, 'store']);
+    Route::put('/services/{id}', [ServiceController::class, 'update']);
+    Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
+});
 
 // Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
 //     Route::get('/portfolio', [PortfolioController::class, 'index']);
@@ -81,10 +81,11 @@ Route::middleware('auth:sanctum')->post('/logout/mua', [MuaAuthController::class
 //     Route::delete('/wishlist/{mua_id}', [WishlistController::class, 'destroy']);
 // });
 
-// Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
-//     Route::get('/profile', [CustomerProfileController::class, 'show']);
-//     Route::put('/profile', [CustomerProfileController::class, 'update']);
-// });
+Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
+    Route::get('/profile', [CustomerProfileController::class, 'show']);
+    Route::post('/profile', [CustomerProfileController::class, 'store']);
+    Route::put('/profile', [CustomerProfileController::class, 'update']);
+});
 
 Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
     Route::get('/profile/{id}', [MuaProfileController::class, 'index']);

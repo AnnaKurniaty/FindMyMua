@@ -16,16 +16,7 @@ class CustomerAuthController extends Controller
             'name'     => 'required|string',
             'email'    => 'required|email|unique:users',
             'phone'    => 'nullable|string',
-            'password' => 'required|min:6|confirmed',
-
-            'skin_tone'            => 'required|string',
-            'skin_type'            => 'required|string',
-            'skin_issues'          => 'nullable|array',
-            'skin_issues.*'        => 'string',
-            'skincare_history'     => 'nullable|string',
-            'allergies'            => 'nullable|string',
-            'makeup_preferences'   => 'nullable|string',
-            'profile_photo'        => 'nullable|image|max:2048',
+            'password' => 'required|min:6|confirmed'
         ]);
 
         $user = User::create([
@@ -36,24 +27,12 @@ class CustomerAuthController extends Controller
             'role'     => 'customer',
         ]);
 
-        $photoPath = null;
-        if ($request->hasFile('profile_photo')) {
-            $photoPath = $request->file('profile_photo')->store('profiles', 'public');
-        }
-
         CustomerProfile::create([
-            'user_id'             => $user->id,
-            'skin_tone'           => $request->skin_tone,
-            'skin_type'           => $request->skin_type,
-            'skin_issues'         => $request->skin_issues,
-            'skincare_history'    => $request->skincare_history,
-            'allergies'           => $request->allergies,
-            'makeup_preferences'  => $request->makeup_preferences,
-            'profile_photo'       => $photoPath,
+            'user_id' => $user->id
         ]);
 
         return response()->json([
-            'message' => 'Customer registered with skin profile',
+            'message' => 'Customer registered successfully',
             'user'    => $user
         ]);
     }
@@ -80,4 +59,14 @@ class CustomerAuthController extends Controller
 
         return response()->json(['error' => 'Invalid credentials'], 401);
     }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logout berhasil'
+        ]);
+    }
+
 }
