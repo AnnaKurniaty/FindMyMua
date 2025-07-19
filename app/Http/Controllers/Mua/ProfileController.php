@@ -130,8 +130,13 @@ class ProfileController extends Controller
             }
 
             foreach (['makeup_styles', 'makeup_specializations', 'available_days', 'skin_type', 'certification'] as $field) {
-                if (isset($data[$field]) && is_string($data[$field])) {
-                    $data[$field] = json_decode($data[$field], true);
+                if (isset($data[$field])) {
+                    if (is_string($data[$field])) {
+                        $decoded = json_decode($data[$field], true);
+                        $data[$field] = $decoded ?? [];
+                    }
+
+                    $data[$field] = json_encode($data[$field]);
                 }
             }
 
@@ -143,7 +148,10 @@ class ProfileController extends Controller
             ], 201);
         } catch (\Throwable $e) {
             \Log::error('MUA PROFILE STORE ERROR', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Failed to create profile', 'error' => $e->getMessage()], 500);
+            return response()->json([
+                'message' => 'Failed to create profile',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
