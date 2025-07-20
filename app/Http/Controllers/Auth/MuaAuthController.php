@@ -29,19 +29,12 @@ class MuaAuthController extends Controller
                 'role'     => 'mua',
             ]);
 
-            MuaProfile::create([
-                'user_id' => $user->id
-            ]);
-
-            $token = $user->createToken('auth_token')->plainTextToken;
-
             return response()->json([
                 'message'      => 'MUA registered successfully',
-                'access_token' => $token,
-                'token_type'   => 'Bearer',
                 'user'         => $user
             ], 201);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            \Log::error('MUA REGISTER ERROR', ['error' => $e->getMessage()]);
             return response()->json([
                 'message' => 'Failed to register MUA',
                 'error' => $e->getMessage()
