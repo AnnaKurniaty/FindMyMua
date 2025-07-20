@@ -36,7 +36,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/login/mua', [MuaAuthController::class, 'login']);
 });
 
-Route::middleware('auth:sanctum')->post('/logout/mua', [MuaAuthController::class, 'logout']);
+Route::middleware('auth:sanctum')->post('/auth/logout/mua', [MuaAuthController::class, 'logout']);
 
 Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
     Route::get('/services', [ServiceController::class, 'index']);

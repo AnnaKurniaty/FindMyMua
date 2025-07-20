@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -12,29 +13,40 @@ class MuaAuthController extends Controller
 {
     public function register(Request $request)
     {
-        $request->validate([
-            'name'     => 'required|string',
-            'email'    => 'required|email|unique:users',
-            'phone'    => 'nullable|string',
-            'password' => 'required|min:6|confirmed'
-        ]);
+        try {
+            $request->validate([
+                'name'     => 'required|string',
+                'email'    => 'required|email|unique:users',
+                'phone'    => 'nullable|string',
+                'password' => 'required|min:6|confirmed'
+            ]);
 
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'phone'    => $request->phone,
-            'password' => Hash::make($request->password),
-            'role'     => 'mua',
-        ]);
+            $user = User::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'phone'    => $request->phone,
+                'password' => Hash::make($request->password),
+                'role'     => 'mua',
+            ]);
 
-        MuaProfile::create([
-            'user_id' => $user->id
-        ]);
+            MuaProfile::create([
+                'user_id' => $user->id
+            ]);
 
-        return response()->json([
-            'message' => 'MUA registered successfully',
-            'user'    => $user
-        ]);
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'message'      => 'MUA registered successfully',
+                'access_token' => $token,
+                'token_type'   => 'Bearer',
+                'user'         => $user
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to register MUA',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function login(Request $request)
@@ -68,5 +80,4 @@ class MuaAuthController extends Controller
             'message' => 'Logout berhasil'
         ]);
     }
-
 }
