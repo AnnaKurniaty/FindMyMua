@@ -95,7 +95,7 @@ class ProfileController extends Controller
 
             $request->validate([
                 'bio' => 'nullable|string',
-                'certification' => 'nullable|string',
+                'certification' => 'nullable|json',
                 'service_area' => 'nullable|string',
                 'studio_lat' => 'nullable|numeric',
                 'studio_lng' => 'nullable|numeric',
@@ -103,8 +103,8 @@ class ProfileController extends Controller
                 'makeup_specializations' => 'nullable|json',
                 'skin_type' => 'nullable|json',
                 'available_days' => 'nullable|json',
-                'available_start_time' => 'nullable',
-                'available_end_time' => 'nullable',
+                'available_start_time' => 'nullable|date_format:H:i:s',
+                'available_end_time' => 'nullable|date_format:H:i:s',
                 'profile_photo' => 'nullable|image|max:2048',
             ]);
 
@@ -129,14 +129,19 @@ class ProfileController extends Controller
                 $data['profile_photo'] = \Storage::url($path);
             }
 
-            foreach (['makeup_styles', 'makeup_specializations', 'available_days', 'skin_type', 'certification'] as $field) {
-                if (isset($data[$field])) {
-                    if (is_string($data[$field])) {
-                        $decoded = json_decode($data[$field], true);
-                        $data[$field] = $decoded ?? [];
-                    }
+            $jsonFields = [
+                'makeup_styles',
+                'makeup_specializations',
+                'available_days',
+                'skin_type',
+                'certification'
+            ];
 
-                    $data[$field] = json_encode($data[$field]);
+            foreach ($jsonFields as $field) {
+                if (isset($data[$field]) && is_string($data[$field])) {
+                    // decode untuk validasi data array
+                    $decoded = json_decode($data[$field], true);
+                    $data[$field] = json_encode($decoded ?? []);
                 }
             }
 
