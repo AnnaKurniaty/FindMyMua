@@ -12,29 +12,33 @@ class CustomerAuthController extends Controller
 {
     public function register(Request $request)
     {
-        $request->validate([
-            'name'     => 'required|string',
-            'email'    => 'required|email|unique:users',
-            'phone'    => 'nullable|string',
-            'password' => 'required|min:6|confirmed'
-        ]);
+        try {
+            $request->validate([
+                'name'     => 'required|string',
+                'email'    => 'required|email|unique:users',
+                'phone'    => 'nullable|string',
+                'password' => 'required|min:6|confirmed'
+            ]);
 
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'phone'    => $request->phone,
-            'password' => Hash::make($request->password),
-            'role'     => 'customer',
-        ]);
+            $user = User::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'phone'    => $request->phone,
+                'password' => Hash::make($request->password),
+                'role'     => 'customer',
+            ]);
 
-        CustomerProfile::create([
-            'user_id' => $user->id
-        ]);
-
-        return response()->json([
-            'message' => 'Customer registered successfully',
-            'user'    => $user
-        ]);
+            return response()->json([
+                    'message'      => 'Customer registered successfully',
+                    'user'         => $user
+                ], 201);
+        } catch (\Throwable $e) {
+            \Log::error('Customer REGISTER ERROR', ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Failed to register Customer',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function login(Request $request)

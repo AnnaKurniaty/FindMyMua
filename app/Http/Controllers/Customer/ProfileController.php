@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CustomerProfile;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 
 class ProfileController extends Controller
 {
@@ -18,55 +19,79 @@ class ProfileController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'skin_tone'          => 'nullable|string',
-            'skin_type'          => 'nullable|string',
-            'skin_issues'        => 'nullable|array',
-            'skincare_history'   => 'nullable|string',
-            'allergies'          => 'nullable|string',
-            'makeup_preferences' => 'nullable|string',
-            'profile_photo'      => 'nullable|image|max:2048'
-        ]);
+        try {
+            $user = Auth::user();
 
-        $user = Auth::user();
+            $request->validate([
+                'skin_tone'          => 'nullable|string',
+                'skin_type'          => 'nullable|array',
+                'skin_issues'        => 'nullable|string',
+                'address'        => 'nullable|string',
+                'studio_lat'        => 'nullable|string',
+                'studio_lng'        => 'nullable|string',
+                'skincare_history'   => 'nullable|string',
+                'allergies'          => 'nullable|string',
+                'makeup_preferences' => 'nullable|array',
+                'profile_photo'      => 'nullable|image|max:2048'
+            ]);
 
-        if ($user->customerProfile) {
+            $data = $request->only([
+                'skin_tone',
+                'skin_type',
+                'skin_issues',
+                'skincare_history',
+                'allergies',
+                'makeup_preferences',
+                'profile_photo',
+                'address',
+                'studio_lat',
+                'studio_lng'
+            ]);
+
+            $data['user_id'] = $user->id;
+
+            if ($request->hasFile('profile_photo')) {
+                $path = $request->file('profile_photo')->store('public/profile_photos');
+                $data['profile_photo'] = \Storage::url($path);
+            }
+
+            $jsonFields = [
+                'skin_type',
+                'makeup_preferences'
+            ];
+
+            foreach ($jsonFields as $field) {
+                if (isset($data[$field]) && is_string($data[$field])) {
+                    // decode untuk validasi data array
+                    $decoded = json_decode($data[$field], true);
+                    $data[$field] = json_encode($decoded ?? []);
+                }
+            }
+
+            $profile = CustomerProfile::create($data);
+
             return response()->json([
-                'message' => 'Profile already exists',
-            ], 409); // Conflict
+                'message' => 'Customer profile created',
+                'data' => $profile
+            ], 201);
+        } catch (\Throwable $e) {
+            \Log::error('Customer PROFILE STORE ERROR', ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Failed to create profile',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $profile = new \App\Models\CustomerProfile();
-        $profile->user_id           = $user->id;
-        $profile->skin_tone         = $request->input('skin_tone');
-        $profile->skin_type         = $request->input('skin_type');
-        $profile->skin_issues       = $request->input('skin_issues');
-        $profile->skincare_history  = $request->input('skincare_history');
-        $profile->allergies         = $request->input('allergies');
-        $profile->makeup_preferences= $request->input('makeup_preferences');
-
-        if ($request->hasFile('profile_photo')) {
-            $path = $request->file('profile_photo')->store('profiles', 'public');
-            $profile->profile_photo = $path;
-        }
-
-        $profile->save();
-
-        return response()->json([
-            'message' => 'Profile created successfully',
-            'data'    => $profile
-        ], 201);
     }
 
     public function update(Request $request)
     {
         $request->validate([
             'skin_tone'          => 'nullable|string',
-            'skin_type'          => 'nullable|string',
-            'skin_issues'        => 'nullable|array',
+            'skin_type'          => 'nullable|array',
+            'skin_issues'        => 'nullable|string',
             'skincare_history'   => 'nullable|string',
             'allergies'          => 'nullable|string',
-            'makeup_preferences' => 'nullable|string',
+            'makeup_preferences' => 'nullable|array',
             'profile_photo'      => 'nullable|image|max:2048'
         ]);
 

@@ -30,6 +30,7 @@ class MuaProfile extends Model
         'makeup_specializations' => 'array',
         'skin_type' => 'array',
         'available_days' => 'array',
+        'certification' => 'array',
     ];
 
     public function user()
