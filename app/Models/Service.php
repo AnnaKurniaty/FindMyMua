@@ -13,7 +13,8 @@ class Service extends Model
         'price',
         'duration',
         'photo',
-        'makeup_style'
+        'makeup_style',
+        'category'
     ];
     protected $appends = ['formatted_price'];
 

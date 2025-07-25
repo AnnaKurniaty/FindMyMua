@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\MuaProfile;
 use App\Models\User;
 
-class SearchController extends Controller
+class DashboardController extends Controller
 {
     public function index(Request $request)
     {

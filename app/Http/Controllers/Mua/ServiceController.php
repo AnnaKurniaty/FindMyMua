@@ -23,14 +23,15 @@ class ServiceController extends Controller
             'price'        => 'required|numeric|min:0',
             'duration'     => 'required|string|max:50',
             'photo'        => 'nullable|image|max:2048',
-            'makeup_style' => 'nullable|string|max:100',
+            'makeup_style' => 'nullable|string|max:255',
+            'category'     => 'nullable|string|max:100',
         ]);
 
-        $data = $request->only(['name', 'description', 'price', 'duration', 'makeup_style']);
+        $data = $request->only(['name', 'description', 'price', 'duration', 'makeup_style', 'category']);
         $data['mua_id'] = Auth::id();
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('public/service_photos');
+            $path = $request->file('photo')->store('service_photos');
             $data['photo'] = asset(str_replace('public', 'storage', $path));
         }
 
@@ -52,13 +53,14 @@ class ServiceController extends Controller
             'price'        => 'required|numeric|min:0',
             'duration'     => 'required|string|max:50',
             'photo'        => 'nullable|image|max:2048',
-            'makeup_style' => 'nullable|string|max:100',
+            'makeup_style' => 'nullable|string|max:255',
+            'category'     => 'nullable|string|max:100',
         ]);
 
-        $data = $request->only(['name', 'description', 'price', 'duration', 'makeup_style']);
+        $data = $request->only(['name', 'description', 'price', 'duration', 'makeup_style', 'category']);
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('public/service_photos');
+            $path = $request->file('photo')->store('service_photos');
             $data['photo'] = asset(str_replace('public', 'storage', $path));
         }
 

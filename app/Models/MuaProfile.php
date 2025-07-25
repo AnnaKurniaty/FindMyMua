@@ -33,6 +33,15 @@ class MuaProfile extends Model
         'certification' => 'array',
     ];
 
+    protected $appends = ['profile_photo_url'];
+
+    public function getProfilePhotoUrlAttribute()
+    {
+        return $this->attributes['profile_photo']
+            ? asset('storage/profile_photos/' . $this->attributes['profile_photo'])
+            : asset('images/default-avatar.png');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

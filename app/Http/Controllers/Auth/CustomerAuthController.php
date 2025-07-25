@@ -72,5 +72,4 @@ class CustomerAuthController extends Controller
             'message' => 'Logout berhasil'
         ]);
     }
-
 }

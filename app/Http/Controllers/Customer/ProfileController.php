@@ -11,10 +11,17 @@ use App\Models\User;
 
 class ProfileController extends Controller
 {
+
     public function show()
     {
-        $profile = Auth::user()->customerProfile;
-        return response()->json($profile);
+        $user = Auth::user();
+        $profile = $user->customerProfile;
+
+        if (!$profile) {
+            return response()->json(['message' => 'Profile not found'], 404);
+        }
+
+        return response()->json($user);
     }
 
     public function store(Request $request)
