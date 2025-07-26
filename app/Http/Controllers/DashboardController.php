@@ -37,4 +37,18 @@ class DashboardController extends Controller
 
         return response()->json($results);
     }
+
+    public function getAllMuaWithProfile()
+    {
+        $muaUsers = User::where('role', 'mua')
+            ->whereHas('muaProfile') // hanya yang punya profil
+            ->with([
+                'muaProfile',
+                'services',     // jika kamu ingin harga dan layanan
+                'portfolios'    // jika ingin gambar portfolio
+            ])
+            ->get();
+
+        return response()->json($muaUsers);
+    }
 }

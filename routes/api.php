@@ -61,6 +61,7 @@ Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
 Route::middleware(['auth:sanctum'])->prefix('dashboard')->group(function () {
     Route::get('/mua/search', [DashboardController::class, 'index']);
     Route::get('/mua', [DashboardController::class, 'mua']);
+    Route::get('/mua-users', [DashboardController::class, 'getAllMuaWithProfile']);
 });
 // Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
 //     Route::get('/bookings', [CustomerBookingController::class, 'index']);
