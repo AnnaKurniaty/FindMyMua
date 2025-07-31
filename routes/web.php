@@ -11,5 +11,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Optional: If you serve the Vue app via Laravel (not recommended when using Vite dev server)
-Route::view('/{any}', 'app')->where('any', '.*');
+//// Optional: If you serve the Vue app via Laravel (not recommended when using Vite dev server)
+// Route::view('/{any}', 'app')->where('any', '.*');

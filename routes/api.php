@@ -26,6 +26,7 @@ use App\Http\Controllers\Mua\ReportController;
 Route::middleware('auth:sanctum')->get('/me', [MeController::class, 'me']);
 // Route::middleware('auth:sanctum')->get('/users', [MeController::class, 'index']);
 Route::get('/users', [MeController::class, 'index']);
+Route::middleware('auth:sanctum')->put('/me', [MeController::class, 'update']);
 
 
 Route::prefix('auth')->group(function () {
@@ -44,6 +45,8 @@ Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
     Route::post('/services', [ServiceController::class, 'store']);
     Route::put('/services/{id}', [ServiceController::class, 'update']);
     Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
+    Route::get('/services/analytics', [ServiceController::class, 'analytics']);
+    Route::get('/{id}/services', [ServiceController::class, 'getServicesByMuaId']);
 });
 
 Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
@@ -63,56 +66,82 @@ Route::middleware(['auth:sanctum'])->prefix('dashboard')->group(function () {
     Route::get('/mua', [DashboardController::class, 'mua']);
     Route::get('/mua-users', [DashboardController::class, 'getAllMuaWithProfile']);
 });
-// Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
-//     Route::get('/bookings', [CustomerBookingController::class, 'index']);
-//     Route::post('/bookings', [CustomerBookingController::class, 'store']);
-// });
+Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
+    Route::get('/bookings', [CustomerBookingController::class, 'index']);
+    Route::post('/bookings', [CustomerBookingController::class, 'store']);
+    Route::get('/bookings/{id}', [CustomerBookingController::class, 'show']);
+});
 
-// Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
-//     Route::get('/bookings', [MuaBookingController::class, 'index']);
-//     Route::put('/bookings/{id}/status', [MuaBookingController::class, 'updateStatus']);
-// });
+Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
+    Route::get('/bookings', [MuaBookingController::class, 'index']);
+    Route::get('/bookings/summary', [MuaBookingController::class, 'summary']);
+    Route::put('/bookings/{id}/status', [MuaBookingController::class, 'updateStatus']);
+    Route::put('/bookings/{id}', [MuaBookingController::class, 'update']);
+});
 
-// Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
-//     Route::get('/recommendations', [RecommendationController::class, 'index']);
-// });
+Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
+    Route::get('/recommendations', [RecommendationController::class, 'index']);
+});
 
-// Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
-//     Route::post('/reviews', [ReviewController::class, 'store']);
-// });
+Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
+    Route::post('/reviews', [ReviewController::class, 'store']);
+});
 
-// Route::get('/mua/{mua_id}/reviews', function ($mua_id) {
-//     return \App\Models\Review::whereHas('booking', function ($q) use ($mua_id) {
-//         $q->where('mua_id', $mua_id);
-//     })->latest()->get();
-// });
+Route::get('/mua/{mua_id}/reviews', function ($mua_id) {
+    return \App\Models\Review::whereHas('booking', function ($q) use ($mua_id) {
+        $q->where('mua_id', $mua_id);
+    })->latest()->get();
+});
 
-// Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
-//     Route::get('/wishlist', [WishlistController::class, 'index']);
-//     Route::post('/wishlist', [WishlistController::class, 'store']);
-//     Route::delete('/wishlist/{mua_id}', [WishlistController::class, 'destroy']);
-// });
+Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
+    Route::get('/wishlist', [WishlistController::class, 'index']);
+    Route::post('/wishlist', [WishlistController::class, 'store']);
+    Route::delete('/wishlist/{mua_id}', [WishlistController::class, 'destroy']);
+});
 
-// Route::get('/mua/{id}', [MuaProfileController::class, 'public']);
+Route::get('/mua/{id}', [MuaProfileController::class, 'public']);
 Route::get('/mua/search', [DashboardController::class, 'index']);
-// Route::get('/mua/{id}/availability', [AvailabilityController::class, 'show']);
+Route::get('/mua/{id}/availability', [AvailabilityController::class, 'show']);
 
-// Route::middleware('auth:sanctum')->group(function () {
-//     Route::get('/notifications', [NotificationController::class, 'index']);
-//     Route::post('/notifications/read', [NotificationController::class, 'markAllAsRead']);
-// });
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/read', [NotificationController::class, 'markAllAsRead']);
+});
 
-// Route::middleware('auth:sanctum')->group(function () {
-//     Route::get('/chat/{booking_id}', [ChatController::class, 'index']);
-//     Route::post('/chat/{booking_id}', [ChatController::class, 'store']);
-// });
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/chat/{booking_id}', [ChatController::class, 'index']);
+    Route::post('/chat/{booking_id}', [ChatController::class, 'store']);
+});
 
-// Route::middleware(['auth:sanctum'])->group(function () {
-//     Route::get('/booking/{id}/pay', [BookingPaymentController::class, 'pay']);
-// });
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/booking/{id}/pay', [BookingPaymentController::class, 'pay']);
+});
 
-// Route::post('/midtrans/callback', [MidtransCallbackController::class, 'handle']);
+Route::post('/midtrans/callback', [MidtransCallbackController::class, 'handle']);
 
-// Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
-//     Route::get('/reports', [ReportController::class, 'index']);
-// });
+// Blocked time slots
+Route::middleware(['auth:sanctum'])->prefix('blocked-slots')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Mua\BlockedTimeSlotController::class, 'index']);
+    Route::post('/', [\App\Http\Controllers\Mua\BlockedTimeSlotController::class, 'store']);
+    Route::delete('/{id}', [\App\Http\Controllers\Mua\BlockedTimeSlotController::class, 'destroy']);
+});
+
+Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
+    Route::get('/reports', [ReportController::class, 'index']);
+    
+    Route::get('/services', [ServiceController::class, 'index']);
+    Route::post('/services', [ServiceController::class, 'store']);
+    Route::put('/services/{id}', [ServiceController::class, 'update']);
+    Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
+    Route::get('/services/analytics', [ServiceController::class, 'analytics']);
+    Route::get('/{id}/services', [ServiceController::class, 'getServicesByMuaId']);
+    
+    Route::get('/profile', [MuaProfileController::class, 'show']);
+    Route::put('/profile', [MuaProfileController::class, 'update']);
+    Route::post('/profile', [MuaProfileController::class, 'store']);
+    
+    Route::get('/bookings', [MuaBookingController::class, 'index']);
+    Route::get('/bookings/summary', [MuaBookingController::class, 'summary']);
+    Route::put('/bookings/{id}/status', [MuaBookingController::class, 'updateStatus']);
+    Route::put('/bookings/{id}', [MuaBookingController::class, 'update']);
+});

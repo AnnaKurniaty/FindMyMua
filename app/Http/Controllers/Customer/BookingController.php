@@ -52,4 +52,15 @@ class BookingController extends Controller
             'data'    => $booking
         ]);
     }
+
+    public function show($id)
+    {
+        $booking = Booking::where('id', $id)->where('customer_id', auth()->id())->with(['mua', 'service'])->first();
+
+        if (!$booking) {
+            return response()->json(['message' => 'Booking not found'], 404);
+        }
+
+        return response()->json($booking);
+    }
 }

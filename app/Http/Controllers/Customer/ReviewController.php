@@ -17,10 +17,10 @@ class ReviewController extends Controller
             'comment'    => 'nullable|string'
         ]);
 
-        $booking = Booking::where('id', $request->booking_id)
-            ->where('customer_id', Auth::id())
-            ->where('status', 'completed')
-            ->firstOrFail();
+$booking = Booking::where('id', $request->booking_id)
+    ->where('customer_id', Auth::id())
+    ->where('status', 'finished')
+    ->firstOrFail();
 
         if ($booking->review) {
             return response()->json(['message' => 'Review already submitted'], 409);
