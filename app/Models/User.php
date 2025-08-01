@@ -14,6 +14,13 @@ class User extends Authenticatable
 
     protected $hidden = ['password', 'remember_token'];
 
+    protected $appends = ['profile_photo_url'];
+
+    public function getProfilePhotoUrlAttribute()
+    {
+        return $this->muaProfile ? $this->muaProfile->profile_photo_url : asset('images/default-avatar.png');
+    }
+
     public function customerProfile()
     {
         return $this->hasOne(CustomerProfile::class);

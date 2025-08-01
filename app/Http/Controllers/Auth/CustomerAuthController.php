@@ -13,27 +13,92 @@ class CustomerAuthController extends Controller
     public function register(Request $request)
     {
         try {
+            // Handle both JSON and form data
+            $name = $request->input('name') ?? $request->name;
+            $email = $request->input('email') ?? $request->email;
+            $phone = $request->input('phone') ?? $request->phone;
+            $password = $request->input('password') ?? $request->password;
+            
             $request->validate([
                 'name'     => 'required|string',
                 'email'    => 'required|email|unique:users',
                 'phone'    => 'nullable|string',
                 'password' => 'required|min:6|confirmed'
+            ], [
+                'name.required' => 'Name is required',
+                'email.required' => 'Email is required',
+                'email.email' => 'Email must be a valid email address',
+                'email.unique' => 'Email already exists',
+                'password.required' => 'Password is required',
+                'password.min' => 'Password must be at least 6 characters',
+                'password.confirmed' => 'Password confirmation does not match'
             ]);
 
             $user = User::create([
-                'name'     => $request->name,
-                'email'    => $request->email,
-                'phone'    => $request->phone,
-                'password' => Hash::make($request->password),
+                'name'     => $name,
+                'email'    => $email,
+                'phone'    => $phone,
+                'password' => Hash::make($password),
                 'role'     => 'customer',
             ]);
 
+            // Create customer profile
+            $profileData = [
+                'user_id' => $user->id,
+                'address' => $request->input('address') ?? $request->address ?? null,
+                'skin_tone' => $request->input('skin_tone') ?? $request->skin_tone ?? null,
+                'skin_type' => $request->input('skin_type') ?? $request->skin_type ?? null,
+                'skincare_history' => $request->input('skincare_history') ?? $request->skincare_history ?? null,
+                'allergies' => $request->input('allergies') ?? $request->allergies ?? null,
+                'makeup_preferences' => $request->input('makeup_preferences') ?? $request->makeup_preferences ?? null,
+                'skin_issues' => $request->input('skin_issues') ?? $request->skin_issues ?? null,
+            ];
+
+            // Handle JSON fields properly
+            $jsonFields = ['skin_type', 'makeup_preferences'];
+            foreach ($jsonFields as $field) {
+                if (isset($profileData[$field])) {
+                    // If it's already a string, check if it's JSON
+                    if (is_string($profileData[$field])) {
+                        $decoded = json_decode($profileData[$field], true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $profileData[$field] = $decoded;
+                        } else {
+                            // If not JSON, treat as comma-separated
+                            $profileData[$field] = array_filter(array_map('trim', explode(',', $profileData[$field])));
+                        }
+                    }
+                    // If it's an array, keep as is
+                }
+            }
+            
+            // Ensure empty arrays are properly handled
+            foreach ($jsonFields as $field) {
+                if (isset($profileData[$field]) && is_array($profileData[$field]) && empty($profileData[$field])) {
+                    $profileData[$field] = [];
+                }
+            }
+
+            // Handle profile photo upload
+            if ($request->hasFile('profile_photo')) {
+                $path = $request->file('profile_photo')->store('profile_photos', 'public');
+                $profileData['profile_photo'] = basename($path);
+            }
+
+            // Create the profile
+            $profile = CustomerProfile::create($profileData);
+
             return response()->json([
-                    'message'      => 'Customer registered successfully',
-                    'user'         => $user
-                ], 201);
+                'message' => 'Customer registered successfully',
+                'user' => $user,
+                'profile' => $profile
+            ], 201);
         } catch (\Throwable $e) {
-            \Log::error('Customer REGISTER ERROR', ['error' => $e->getMessage()]);
+            \Log::error('Customer REGISTER ERROR', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
             return response()->json([
                 'message' => 'Failed to register Customer',
                 'error' => $e->getMessage()

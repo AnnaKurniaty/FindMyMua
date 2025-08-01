@@ -70,6 +70,7 @@ Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
     Route::get('/bookings', [CustomerBookingController::class, 'index']);
     Route::post('/bookings', [CustomerBookingController::class, 'store']);
     Route::get('/bookings/{id}', [CustomerBookingController::class, 'show']);
+    Route::put('/bookings/{id}', [CustomerBookingController::class, 'update']);
 });
 
 Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
@@ -99,7 +100,7 @@ Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
     Route::delete('/wishlist/{mua_id}', [WishlistController::class, 'destroy']);
 });
 
-Route::get('/mua/{id}', [MuaProfileController::class, 'public']);
+Route::get('/mua/{id}', [MuaProfileController::class, 'publicProfile']);
 Route::get('/mua/search', [DashboardController::class, 'index']);
 Route::get('/mua/{id}/availability', [AvailabilityController::class, 'show']);
 

@@ -23,6 +23,18 @@ class ProfileController extends Controller
         return response()->json($user);
     }
 
+    public function publicProfile($id)
+    {
+        $user = User::with('muaProfile')->find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        if (!$user->muaProfile) {
+            return response()->json(['message' => 'Profile not found'], 404);
+        }
+        return response()->json($user);
+    }
+
     public function store(Request $request)
     {
         try {

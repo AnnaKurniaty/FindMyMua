@@ -38,13 +38,13 @@ class ProfileController extends Controller
 
             $request->validate([
                 'skin_tone'          => 'nullable|string',
-                'skin_type'          => 'nullable|array',
+                'skin_type'          => 'nullable', // Can be string or array
                 'skin_issues'        => 'nullable|string',
-                'address'        => 'nullable|string',
+                'address'            => 'nullable|string',
                 'skincare_history'   => 'nullable|string',
                 'allergies'          => 'nullable|string',
-                'makeup_preferences' => 'nullable|array',
-                'profile_photo'      => 'nullable|image|max:2048'
+                'makeup_preferences' => 'nullable', // Can be string or array
+                'profile_photo'      => 'nullable|image|max:2048',
             ]);
 
             $data = $request->only([
@@ -60,22 +60,39 @@ class ProfileController extends Controller
 
             $data['user_id'] = $user->id;
 
-            if ($request->hasFile('profile_photo')) {
-                $path = $request->file('profile_photo')->store('public/profile_photos');
-                $data['profile_photo'] = \Storage::url($path);
-            }
-
+            // Handle JSON fields properly
             $jsonFields = [
                 'skin_type',
                 'makeup_preferences'
             ];
 
             foreach ($jsonFields as $field) {
-                if (isset($data[$field]) && is_string($data[$field])) {
-                    // decode untuk validasi data array
-                    $decoded = json_decode($data[$field], true);
-                    $data[$field] = json_encode($decoded ?? []);
+                if (isset($data[$field])) {
+                    // If it's already an array, keep as is (model will handle JSON conversion)
+                    if (is_array($data[$field])) {
+                        // Handle empty arrays
+                        if (empty($data[$field])) {
+                            $data[$field] = [];
+                        }
+                        continue;
+                    }
+                    // If it's a string, check if it's already JSON
+                    elseif (is_string($data[$field])) {
+                        $decoded = json_decode($data[$field], true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            // Keep as is since it's already JSON
+                            continue;
+                        } else {
+                            // If JSON decode fails, try to parse as comma-separated string
+                            $data[$field] = array_map('trim', explode(',', trim($data[$field], '[]')));
+                        }
+                    }
                 }
+            }
+
+            if ($request->hasFile('profile_photo')) {
+                $path = $request->file('profile_photo')->store('profile_photos', 'public');
+                $data['profile_photo'] = basename($path);
             }
 
             $profile = CustomerProfile::create($data);
@@ -85,7 +102,11 @@ class ProfileController extends Controller
                 'data' => $profile
             ], 201);
         } catch (\Throwable $e) {
-            \Log::error('Customer PROFILE STORE ERROR', ['error' => $e->getMessage()]);
+            \Log::error('Customer PROFILE STORE ERROR', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
             return response()->json([
                 'message' => 'Failed to create profile',
                 'error' => $e->getMessage()
@@ -100,8 +121,7 @@ class ProfileController extends Controller
             $profile = $user->customerProfile;
 
             if (!$profile) {
-                $profile = new CustomerProfile();
-                $profile->user_id = $user->id;
+                return response()->json(['message' => 'Profile not found'], 404);
             }
 
             \Log::info('CUSTOMER PROFILE UPDATE REQUEST', [
@@ -178,9 +198,9 @@ class ProfileController extends Controller
             if ($request->hasFile('profile_photo')) {
                 // Delete old photo if exists
                 if ($profile->profile_photo) {
-                    Storage::disk('public')->delete('profiles/' . $profile->profile_photo);
+                    Storage::disk('public')->delete('profile_photos/' . $profile->profile_photo);
                 }
-                $path = $request->file('profile_photo')->store('profiles', 'public');
+                $path = $request->file('profile_photo')->store('profile_photos', 'public');
                 $validated['profile_photo'] = basename($path);
                 \Log::info('Profile photo uploaded', ['path' => $path]);
             }

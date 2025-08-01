@@ -63,4 +63,25 @@ class BookingController extends Controller
 
         return response()->json($booking);
     }
+
+    public function update(Request $request, $id)
+    {
+        $booking = Booking::where('id', $id)->where('customer_id', auth()->id())->first();
+
+        if (!$booking) {
+            return response()->json(['message' => 'Booking not found'], 404);
+        }
+
+        $request->validate([
+            'customer_skin_profile_snapshot' => 'required|array',
+        ]);
+
+        $booking->customer_skin_profile_snapshot = $request->customer_skin_profile_snapshot;
+        $booking->save();
+
+        return response()->json([
+            'message' => 'Booking updated',
+            'data' => $booking,
+        ]);
+    }
 }

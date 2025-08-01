@@ -10,7 +10,7 @@ class WishlistController extends Controller
 {
     public function index()
     {
-        $wishlists = Wishlist::with('mua')
+        $wishlists = Wishlist::with(['mua.muaProfile', 'mua.services'])
             ->where('customer_id', Auth::id())
             ->get();
 
