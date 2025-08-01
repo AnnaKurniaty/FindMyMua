@@ -8,7 +8,7 @@ class Booking extends Model
     protected $fillable = [
         'customer_id', 'mua_id', 'service_id', 'date', 'time',
         'status', 'payment_status', 'total_price', 'payment_method',
-        'customer_skin_profile_snapshot'
+        'payment_proof', 'customer_skin_profile_snapshot'
     ];
 
     protected $casts = [
