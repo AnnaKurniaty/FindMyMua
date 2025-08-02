@@ -16,11 +16,11 @@ return [
     */
 
     // 'paths' => ['api/*', 'sanctum/csrf-cookie'],
-    'paths' => ['api/*', 'mua/*', 'sanctum/csrf-cookie', 'login', 'logout'],
+    'paths' => ['api/*', 'mua/*', 'sanctum/csrf-cookie', 'login/*', 'auth/*', 'logout'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    'allowed_origins' => ['http://localhost:5173', 'http://127.0.0.1:5173', 'https://findmymua-production.up.railway.app', 'https://wezzbeauty.netlify.app'],
 
     'allowed_origins_patterns' => [],
 

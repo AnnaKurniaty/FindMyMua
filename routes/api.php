@@ -22,6 +22,14 @@ use App\Http\Controllers\Customer\BookingPaymentController;
 use App\Http\Controllers\MidtransCallbackController;
 use App\Http\Controllers\Mua\ReportController;
 
+use Fruitcake\Cors\HandleCors;
+use Illuminate\Http\Request as HttpRequest;
+
+Route::options('{any}', function (HttpRequest $request) {
+    $cors = new HandleCors();
+    $response = response()->json([], 200);
+    return $cors->addActualRequestHeaders($response, $request);
+})->where('any', '.*');
 
 Route::middleware('auth:sanctum')->get('/me', [MeController::class, 'me']);
 // Route::middleware('auth:sanctum')->get('/users', [MeController::class, 'index']);
