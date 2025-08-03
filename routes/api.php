@@ -97,9 +97,17 @@ Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
 });
 
 Route::get('/mua/{mua_id}/reviews', function ($mua_id) {
-    return \App\Models\Review::whereHas('booking', function ($q) use ($mua_id) {
+    return \App\Models\Review::with('booking.customer')->whereHas('booking', function ($q) use ($mua_id) {
         $q->where('mua_id', $mua_id);
-    })->latest()->get();
+    })->latest()->get()->map(function ($review) {
+        return [
+            'id' => $review->id,
+            'rating' => $review->rating,
+            'comment' => $review->comment,
+            'created_at' => $review->created_at,
+            'customer_name' => $review->booking->customer->name ?? 'Anonymous',
+        ];
+    });
 });
 
 Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
