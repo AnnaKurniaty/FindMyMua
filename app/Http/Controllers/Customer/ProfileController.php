@@ -11,6 +11,12 @@ use App\Models\User;
 
 class ProfileController extends Controller
 {
+    protected $imageUploadService;
+
+    public function __construct(ImageUploadService $imageUploadService)
+    {
+        $this->imageUploadService = $imageUploadService;
+    }
 
     public function show()
     {
@@ -91,8 +97,13 @@ class ProfileController extends Controller
             }
 
             if ($request->hasFile('profile_photo')) {
-                $path = $request->file('profile_photo')->store('profile_photos', 'public');
-                $data['profile_photo'] = basename($path);
+                // Delete old photo if exists
+                if ($profile->profile_photo) {
+                    $this->imageUploadService->deleteImage($profile->profile_photo, 'images/profile_photos');
+                }
+                
+                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo'));
+                $validated['profile_photo'] = $filename;
             }
 
             $profile = CustomerProfile::create($data);
@@ -195,14 +206,8 @@ class ProfileController extends Controller
             ]);
 
             // Handle profile photo upload
-            if ($request->hasFile('profile_photo')) {
-                // Delete old photo if exists
-                if ($profile->profile_photo) {
-                    Storage::disk('public')->delete('profile_photos/' . $profile->profile_photo);
-                }
-                $path = $request->file('profile_photo')->store('profile_photos', 'public');
-                $validated['profile_photo'] = basename($path);
-                \Log::info('Profile photo uploaded', ['path' => $path]);
+            if ($profile->profile_photo) {
+                $profile->profile_photo_url = $this->imageUploadService->getImageUrl($profile->profile_photo, 'images/profile_photos');
             }
 
             // Update profile - the model's $casts will handle array to JSON conversion

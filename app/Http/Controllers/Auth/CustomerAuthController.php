@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\Auth;
 
 class CustomerAuthController extends Controller
 {
+    protected $imageUploadService;
+
+    public function __construct(ImageUploadService $imageUploadService)
+    {
+        $this->imageUploadService = $imageUploadService;
+    }
+    
     public function register(Request $request)
     {
         try {
@@ -81,8 +88,8 @@ class CustomerAuthController extends Controller
 
             // Handle profile photo upload
             if ($request->hasFile('profile_photo')) {
-                $path = $request->file('profile_photo')->store('profile_photos', 'public');
-                $profileData['profile_photo'] = basename($path);
+                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo'));
+                $profileData['profile_photo'] = $filename;
             }
 
             // Create the profile
