@@ -69,10 +69,9 @@ Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
     Route::post('/profile', [MuaProfileController::class, 'store']);
 });
 
-Route::middleware(['auth:sanctum'])->prefix('dashboard')->group(function () {
+Route::prefix('dashboard')->group(function () {
     Route::get('/mua/search', [DashboardController::class, 'index']);
     Route::get('/mua', [DashboardController::class, 'mua']);
-    Route::get('/mua-users', [DashboardController::class, 'getAllMuaWithProfile']);
 });
 Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
     Route::get('/bookings', [CustomerBookingController::class, 'index']);
@@ -120,9 +119,11 @@ Route::get('/mua/{id}', [MuaProfileController::class, 'publicProfile']);
 Route::get('/mua/search', [DashboardController::class, 'index']);
 Route::get('/mua/{id}/availability', [AvailabilityController::class, 'show']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/notifications', [NotificationController::class, 'index']);
-    Route::post('/notifications/read', [NotificationController::class, 'markAllAsRead']);
+Route::middleware('auth:sanctum')->prefix('notifications')->group(function () {
+    Route::get('/', [NotificationController::class, 'index']);
+    Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::put('/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {

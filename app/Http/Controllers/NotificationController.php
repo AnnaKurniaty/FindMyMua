@@ -14,6 +14,29 @@ class NotificationController extends Controller
             ->get();
     }
 
+    public function unreadCount()
+    {
+        return response()->json([
+            'count' => Notification::where('user_id', Auth::id())
+                ->where('read', false)
+                ->count()
+        ]);
+    }
+
+    public function markAsRead($id)
+    {
+        $notification = Notification::where('user_id', Auth::id())
+            ->where('id', $id)
+            ->firstOrFail();
+            
+        $notification->update([
+            'read' => true,
+            'sent_at' => now()
+        ]);
+
+        return response()->json(['message' => 'Notifikasi ditandai sudah dibaca']);
+    }
+
     public function markAllAsRead()
     {
         Notification::where('user_id', Auth::id())
