@@ -87,20 +87,34 @@ class RecommendationService
     {
         $score = 0;
 
-        // Always return at least a minimal score to ensure recommendations
-        $baseScore = 0.1;
+        // Increased base score to ensure minimum visibility
+        $baseScore = 0.5;
 
-        // Skin type matching (40% weight)
+        // Handle empty arrays with fallback scoring
+        $hasCustomerData = !empty($customerSkinTypes) || !empty($customerMakeupPreferences);
+        $hasMuaData = !empty($mua->skin_type) || !empty($mua->makeup_styles) || !empty($mua->makeup_specializations);
+
+        // If either profile has no data, use enhanced base score
+        if (!$hasCustomerData || !$hasMuaData) {
+            return $baseScore;
+        }
+
+        // Skin type matching (40% weight) - with better handling
         $skinTypeScore = $this->calculateSkinTypeMatch($customerSkinTypes, $mua->skin_type ?? []);
         $score += $skinTypeScore * 0.4;
 
-        // Makeup style matching (50% weight)
+        // Makeup style matching (50% weight) - with better handling
         $makeupStyleScore = $this->calculateMakeupStyleMatch($customerMakeupPreferences, $mua->makeup_styles ?? []);
         $score += $makeupStyleScore * 0.5;
 
-        // Specialization bonus (10% weight)
+        // Specialization bonus (10% weight) - with better handling
         $specializationScore = $this->calculateSpecializationMatch($customerMakeupPreferences, $mua->makeup_specializations ?? []);
         $score += $specializationScore * 0.1;
+
+        // Enhanced fallback scoring for partial matches
+        if ($score < $baseScore && ($skinTypeScore > 0 || $makeupStyleScore > 0)) {
+            $score = max($score, $baseScore);
+        }
 
         // Ensure minimum score for active MUAs
         $finalScore = max($score, $baseScore);

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\CustomerProfile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ImageUploadService;
 
 class CustomerAuthController extends Controller
 {
@@ -87,18 +88,24 @@ class CustomerAuthController extends Controller
             }
 
             // Handle profile photo upload
+            $profilePhotoUrl = null;
             if ($request->hasFile('profile_photo')) {
                 $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo'));
                 $profileData['profile_photo'] = $filename;
+                $profilePhotoUrl = $this->imageUploadService->getImageUrl($filename, 'images/profile_photos');
             }
 
             // Create the profile
             $profile = CustomerProfile::create($profileData);
 
+            // Add profile photo URL to response
+            $profileArray = $profile->toArray();
+            $profileArray['profile_photo_url'] = $profilePhotoUrl;
+
             return response()->json([
                 'message' => 'Customer registered successfully',
                 'user' => $user,
-                'profile' => $profile
+                'profile' => $profileArray
             ], 201);
         } catch (\Throwable $e) {
             \Log::error('Customer REGISTER ERROR', [

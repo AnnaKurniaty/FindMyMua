@@ -72,7 +72,15 @@ class ImageUploadService
             $path = $this->determinePath($filename);
         }
         
-        return Storage::disk($this->disk)->url($path);
+        // Get the full URL from S3/Supabase
+        $url = Storage::disk($this->disk)->url($path);
+        
+        // Ensure the URL is absolute and properly formatted for Supabase
+        if (strpos($url, 'http') !== 0) {
+            $url = rtrim(env('AWS_URL', 'https://your-supabase-url.supabase.co'), '/') . '/' . ltrim($path, '/');
+        }
+        
+        return $url;
     }
     
     private function determinePath($filename)

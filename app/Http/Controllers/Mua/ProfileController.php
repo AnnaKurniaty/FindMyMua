@@ -203,9 +203,9 @@ class ProfileController extends Controller
             if ($request->hasFile('profile_photo')) {
                 // Delete old photo if exists
                 if ($profile->profile_photo) {
-                    Storage::disk('public')->delete('profile_photos/' . $profile->profile_photo);
+                    Storage::disk('public')->delete('images/profile_photos/' . $profile->profile_photo);
                 }
-                $path = $request->file('profile_photo')->store('profile_photos', 'public');
+                $path = $request->file('profile_photo')->store('images/profile_photos', 'public');
                 $validated['profile_photo'] = basename($path);
                 \Log::info('Profile photo uploaded', ['path' => $path]);
             }

@@ -40,7 +40,7 @@ class ServiceController extends Controller
         $data['mua_id'] = Auth::id();
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('service_photos', 'public');
+            $path = $request->file('photo')->store('images/service_photos', 'public');
             $data['photo'] = basename($path);
         }
 
@@ -69,7 +69,7 @@ class ServiceController extends Controller
         $data = $request->only(['name', 'description', 'price', 'duration', 'makeup_style', 'category']);
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('service_photos', 'public');
+            $path = $request->file('photo')->store('images/service_photos', 'public');
             $data['photo'] = basename($path);
         }
 
