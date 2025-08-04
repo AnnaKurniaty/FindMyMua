@@ -39,6 +39,13 @@ class RecommendationService
                 $mua
             );
 
+            // Tambahkan log per MUA
+            Log::info('MUA match score calculated', [
+                'mua_id' => $mua->user_id ?? $mua->id ?? null,
+                'score' => $score,
+                'name' => $mua->user->name ?? '(no name)',
+            ]);
+
             if ($score > 0) {
                 $scoredMuas[] = [
                     'mua' => $mua,
