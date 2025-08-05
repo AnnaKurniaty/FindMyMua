@@ -94,7 +94,7 @@ class ProfileController extends Controller
                 'skincare_history' => 'nullable|string',
                 'allergies' => 'nullable|string',
                 'makeup_preferences' => 'nullable|string',
-                'profile_photo' => 'nullable|image|max:2048',
+                'profile_photo' => 'nullable|image|max:5048',
             ]);
 
             // Handle profile photo upload to S3
