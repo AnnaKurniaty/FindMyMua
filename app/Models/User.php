@@ -18,14 +18,14 @@ class User extends Authenticatable
 
     public function getProfilePhotoUrlAttribute()
     {
-        if (!$this->muaProfile || !$this->muaProfile->profile_photo) {
+        if (!$this->muaProfile && !$this->muaProfile->profile_photo) {
             $defaultAvatar = 'default-avatar.jpeg';
             $supabaseBaseUrl = env('SUPABASE_STORAGE_URL', 'https://fqnrwqaaehzkypgfjdii.supabase.co/storage/v1/object/public/images');
 
             return $supabaseBaseUrl . '/' . $defaultAvatar;
         }
-        $supabaseBaseUrl = rtrim(env('SUPABASE_STORAGE_URL', 'https://fqnrwqaaehzkypgfjdii.supabase.co/storage/v1/object/public/images/profile_photos'), '/') . '/profile_photos';
-        return $supabaseBaseUrl . '/' . ltrim($this->attributes['profile_photo'], '/');
+        $supabaseBaseUrl = rtrim(env('SUPABASE_STORAGE_URL', 'https://fqnrwqaaehzkypgfjdii.supabase.co/storage/v1/object/public/images'), '/') . '/profile_photos';
+        return $supabaseBaseUrl . '/' . ltrim($this->muaProfile->attributes['profile_photo'], '/');
     }
 
     public function customerProfile()
