@@ -37,10 +37,18 @@ class MuaProfile extends Model
 
     public function getProfilePhotoUrlAttribute()
     {
-        return $this->attributes['profile_photo']
-            ? asset('storage/profile_photos/' . $this->attributes['profile_photo'])
-            : asset('storage/default-avatar.png');
+        if ($this->attributes['profile_photo']) {
+            $supabaseBaseUrl = env('SUPABASE_STORAGE_URL', 'https://fqnrwqaaehzkypgfjdii.supabase.co/storage/v1/object/public/images/profile_photos');
+
+            return $supabaseBaseUrl . '/' . ltrim($this->attributes['profile_photo'], '/');
+        }
+
+        $defaultAvatar = 'default-avatar.jpeg';
+        $supabaseBaseUrl = env('SUPABASE_STORAGE_URL', 'https://fqnrwqaaehzkypgfjdii.supabase.co/storage/v1/object/public/images');
+
+        return $supabaseBaseUrl . '/' . $defaultAvatar;
     }
+
 
     public function user()
     {

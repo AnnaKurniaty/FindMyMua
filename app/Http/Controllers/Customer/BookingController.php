@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
@@ -7,9 +8,17 @@ use App\Models\Booking;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Helpers\NotifyHelper;
+use App\Services\ImageUploadService;
 
 class BookingController extends Controller
 {
+    protected $imageUploadService;
+
+    public function __construct(ImageUploadService $imageUploadService)
+    {
+        $this->imageUploadService = $imageUploadService;
+    }
+
     public function index()
     {
         $bookings = Auth::user()->bookingsAsCustomer()->with(['mua', 'service'])->latest()->get();
@@ -27,7 +36,7 @@ class BookingController extends Controller
         ]);
 
         $customerProfile = Auth::user()->customerProfile;
-        
+
         // Ambil service untuk mendapatkan harga
         $service = \App\Models\Service::findOrFail($request->service_id);
 
@@ -75,14 +84,14 @@ class BookingController extends Controller
             return response()->json(['message' => 'Booking not found'], 404);
         }
 
-        // Log semua data yang diterima
-        \Log::info('Update booking request - All input data:', [
-            'all' => $request->all(),
-            'has_payment_method' => $request->has('payment_method'),
-            'payment_method_value' => $request->input('payment_method'),
-            'has_payment_proof' => $request->hasFile('payment_proof'),
-            'has_skin_profile' => $request->has('customer_skin_profile_snapshot'),
-        ]);
+        // // Log semua data yang diterima
+        // \Log::info('Update booking request - All input data:', [
+        //     'all' => $request->all(),
+        //     'has_payment_method' => $request->has('payment_method'),
+        //     'payment_method_value' => $request->input('payment_method'),
+        //     'has_payment_proof' => $request->hasFile('payment_proof'),
+        //     'has_skin_profile' => $request->has('customer_skin_profile_snapshot'),
+        // ]);
 
         // Jika request adalah untuk update skin profile snapshot
         if ($request->has('customer_skin_profile_snapshot')) {
@@ -101,27 +110,21 @@ class BookingController extends Controller
 
         // Periksa apakah ini adalah request method spoofing (POST dengan _method=PUT)
         $isSpoofedPut = $request->input('_method') === 'PUT';
-        
+
         // Jika request adalah untuk update payment method dan payment proof
         // Periksa apakah ada data yang dikirim dengan FormData
         $hasPaymentData = $request->has('payment_method') || $request->hasFile('payment_proof') || $request->isMethod('post') || $isSpoofedPut;
-        
+
         if ($hasPaymentData) {
             // Update payment method jika ada
             if ($request->has('payment_method')) {
                 $booking->payment_method = $request->input('payment_method');
-                \Log::info('Payment method updated:', ['method' => $request->input('payment_method')]);
             }
 
             // Update payment proof jika ada file
             if ($request->hasFile('payment_proof')) {
-                $file = $request->file('payment_proof');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                // Simpan file ke storage/app/public/payment_proofs
-                $path = $file->storeAs('public/payment_proofs', $filename);
-                // Simpan path relatif ke database
-                $booking->payment_proof = 'payment_proofs/' . $filename;
-                \Log::info('Payment proof uploaded:', ['filename' => $filename]);
+                $filename = $this->imageUploadService->uploadPaymentProof($request->file('payment_proof'));
+                $booking->payment_proof = $filename;
             }
 
             $booking->save();
@@ -132,7 +135,7 @@ class BookingController extends Controller
             ]);
         }
 
-        \Log::info('No data to update - returning 400 error');
+        // \Log::info('No data to update - returning 400 error');
         return response()->json(['message' => 'No data to update'], 400);
     }
 }

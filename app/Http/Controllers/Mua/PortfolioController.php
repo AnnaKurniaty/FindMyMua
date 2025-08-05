@@ -1,49 +1,23 @@
 <?php
+
 namespace App\Http\Controllers\Mua;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Portfolio;
+use App\Services\ImageUploadService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-/**
- * @OA\Get(
- *     path="/api/mua/portfolio",
- *     summary="Lihat portofolio MUA",
- *     tags={"Portfolio"},
- *     security={{"bearerAuth":{}}},
- *     @OA\Response(response=200, description="Daftar portofolio")
- * )
- *
- * @OA\Post(
- *     path="/api/mua/portfolio",
- *     summary="Upload portofolio baru",
- *     tags={"Portfolio"},
- *     security={{"bearerAuth":{}}},
- *     @OA\RequestBody(
- *         @OA\MediaType(
- *             mediaType="multipart/form-data",
- *             @OA\Schema(
- *                 @OA\Property(property="image", type="string", format="binary"),
- *                 @OA\Property(property="description", type="string", example="Bridal look 2025")
- *             )
- *         )
- *     ),
- *     @OA\Response(response=201, description="Portofolio ditambahkan")
- * )
- *
- * @OA\Delete(
- *     path="/api/mua/portfolio/{id}",
- *     summary="Hapus portofolio",
- *     tags={"Portfolio"},
- *     security={{"bearerAuth":{}}},
- *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
- *     @OA\Response(response=200, description="Dihapus")
- * )
- */
 class PortfolioController extends Controller
 {
+    protected $imageUploadService;
+
+    public function __construct(ImageUploadService $imageUploadService)
+    {
+        $this->imageUploadService = $imageUploadService;
+    }
+
     public function index()
     {
         $items = Auth::user()->portfolios;
@@ -58,12 +32,13 @@ class PortfolioController extends Controller
             'caption'    => 'nullable|string'
         ]);
 
-        $path = $request->file('file')->store('portfolios', 'public');
+        if ($request->hasFile('file'))
+            $filename = $this->imageUploadService->uploadPortfolioImage($request->file('file'));
 
         $item = Portfolio::create([
             'mua_id'     => Auth::id(),
             'media_type' => $request->media_type,
-            'media_url'  => $path,
+            'media_url'  => $filename,
             'caption'    => $request->caption
         ]);
 
@@ -79,7 +54,9 @@ class PortfolioController extends Controller
             ->where('mua_id', Auth::id())
             ->firstOrFail();
 
-        Storage::disk('public')->delete($item->media_url);
+        if ($item->media_url)
+            $this->imageUploadService->deleteImage($item->media_url, 'images/portfolio');
+
         $item->delete();
 
         return response()->json(['message' => 'Media deleted']);

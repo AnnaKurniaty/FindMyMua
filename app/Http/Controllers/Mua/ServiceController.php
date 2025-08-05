@@ -7,11 +7,19 @@ use Illuminate\Http\Request;
 use App\Models\Service;
 use App\Models\Booking;
 use App\Models\Review;
+use App\Services\ImageUploadService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ServiceController extends Controller
 {
+    protected $imageUploadService;
+
+    public function __construct(ImageUploadService $imageUploadService)
+    {
+        $this->imageUploadService = $imageUploadService;
+    }
+
     public function index()
     {
         $services = Auth::user()->services;
@@ -40,8 +48,8 @@ class ServiceController extends Controller
         $data['mua_id'] = Auth::id();
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('service_photos', 'public');
-            $data['photo'] = basename($path);
+            $filename = $this->imageUploadService->uploadServicePhoto($request->file('photo'));
+            $data['photo'] = $filename;
         }
 
         $service = Service::create($data);
@@ -69,8 +77,8 @@ class ServiceController extends Controller
         $data = $request->only(['name', 'description', 'price', 'duration', 'makeup_style', 'category']);
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('service_photos', 'public');
-            $data['photo'] = basename($path);
+            $filename = $this->imageUploadService->uploadServicePhoto($request->file('photo'), $service->photo);
+            $data['photo'] = $filename;
         }
 
         $service->update($data);

@@ -47,7 +47,7 @@ class ProfileController extends Controller
 
             // Add S3 URL for profile photo
             if ($profile->profile_photo) {
-                $profile->profile_photo_url = $this->imageUploadService->getImageUrl($profile->profile_photo, 'profile_photos');
+                $profile->profile_photo_url = $this->imageUploadService->getImageUrl($profile->profile_photo, 'images/profile_photos');
             } else {
                 $profile->profile_photo_url = null;
             }
@@ -100,11 +100,7 @@ class ProfileController extends Controller
             // Handle profile photo upload to S3
             if ($request->hasFile('profile_photo')) {
                 // Delete old photo if exists
-                if ($profile->profile_photo) {
-                    $this->imageUploadService->deleteImage($profile->profile_photo, 'profile_photos');
-                }
-
-                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo')->store('profile_photos', 'public'));
+                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo'), $profile->profile_photo);
                 $validated['profile_photo'] = $filename;
             }
 
@@ -127,7 +123,7 @@ class ProfileController extends Controller
 
             // Refresh profile with photo URL
             if ($profile->profile_photo) {
-                $profile->profile_photo_url = $this->imageUploadService->getImageUrl($profile->profile_photo, 'profile_photos');
+                $profile->profile_photo_url = $this->imageUploadService->getImageUrl($profile->profile_photo, 'images/profile_photos');
             }
 
             return response()->json([

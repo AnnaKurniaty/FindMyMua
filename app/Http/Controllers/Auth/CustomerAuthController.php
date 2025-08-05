@@ -91,9 +91,9 @@ class CustomerAuthController extends Controller
             // Handle profile photo upload
             $profilePhotoUrl = null;
             if ($request->hasFile('profile_photo')) {
-                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo')->store('profile_photos', 'public'));
+                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo'));
                 $profileData['profile_photo'] = $filename;
-                $profilePhotoUrl = $this->imageUploadService->getImageUrl($filename, 'profile_photos');
+                $profilePhotoUrl = $this->imageUploadService->getImageUrl($filename, 'images/profile_photos');
             }
 
             // Create the profile
@@ -109,11 +109,11 @@ class CustomerAuthController extends Controller
                 'profile' => $profileArray
             ], 201);
         } catch (\Throwable $e) {
-            \Log::error('Customer REGISTER ERROR', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all()
-            ]);
+            // \Log::error('Customer REGISTER ERROR', [
+            //     'error' => $e->getMessage(),
+            //     'trace' => $e->getTraceAsString(),
+            //     'request_data' => $request->all()
+            // ]);
             return response()->json([
                 'message' => 'Failed to register Customer',
                 'error' => $e->getMessage()

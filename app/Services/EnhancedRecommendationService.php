@@ -21,12 +21,12 @@ class EnhancedRecommendationService
         $customerMakeupPreferences = $this->normalizePreferences($customerProfile->makeup_preferences ?? []);
         $customerMakeupStyles = $this->normalizePreferences($customerProfile->makeup_style ?? []);
 
-        Log::info('Enhanced recommendations for customer', [
-            'customer_id' => $customerProfile->user_id,
-            'skin_types' => $customerSkinTypes,
-            'makeup_preferences' => $customerMakeupPreferences,
-            'makeup_styles' => $customerMakeupStyles
-        ]);
+        // Log::info('Enhanced recommendations for customer', [
+        //     'customer_id' => $customerProfile->user_id,
+        //     'skin_types' => $customerSkinTypes,
+        //     'makeup_preferences' => $customerMakeupPreferences,
+        //     'makeup_styles' => $customerMakeupStyles
+        // ]);
 
         // Get all active MUAs
         $muas = MuaProfile::with(['user', 'user.services', 'user.portfolios'])
@@ -78,10 +78,10 @@ class EnhancedRecommendationService
         // Limit results
         $scoredMuas = array_slice($scoredMuas, 0, $limit);
 
-        Log::info('Enhanced recommendations calculated', [
-            'total_muas' => count($scoredMuas),
-            'top_scores' => array_slice(array_column($scoredMuas, 'score'), 0, 5)
-        ]);
+        // Log::info('Enhanced recommendations calculated', [
+        //     'total_muas' => count($scoredMuas),
+        //     'top_scores' => array_slice(array_column($scoredMuas, 'score'), 0, 5)
+        // ]);
 
         return $scoredMuas;
     }

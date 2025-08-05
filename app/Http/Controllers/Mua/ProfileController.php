@@ -8,9 +8,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\MuaProfile;
 use App\Models\User;
+use App\Services\ImageUploadService;
 
 class ProfileController extends Controller
 {
+    protected $imageUploadService;
+
+    public function __construct(ImageUploadService $imageUploadService)
+    {
+        $this->imageUploadService = $imageUploadService;
+    }
+
     public function show()
     {
         $user = Auth::user();
@@ -72,8 +80,8 @@ class ProfileController extends Controller
             $data['user_id'] = $user->id;
 
             if ($request->hasFile('profile_photo')) {
-                $path = $request->file('profile_photo')->store('profile_photos', 'public');
-                $data['profile_photo'] = basename($path);
+                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo'));
+                $data['profile_photo'] = $filename;
             }
 
             $jsonFields = [
@@ -107,7 +115,7 @@ class ProfileController extends Controller
                 'data' => $profile
             ], 201);
         } catch (\Throwable $e) {
-            \Log::error('MUA PROFILE STORE ERROR', ['error' => $e->getMessage()]);
+            // \Log::error('MUA PROFILE STORE ERROR', ['error' => $e->getMessage()]);
             return response()->json([
                 'message' => 'Failed to create profile',
                 'error' => $e->getMessage()
@@ -158,12 +166,10 @@ class ProfileController extends Controller
 
             // ✅ Handle profile photo upload
             if ($request->hasFile('profile_photo')) {
-                if (!empty($profile->getRawOriginal('profile_photo'))) {
-                    Storage::disk('public')->delete('profile_photos/' . $profile->getRawOriginal('profile_photo'));
-                }
-
-                $path = $request->file('profile_photo')->store('profile_photos', 'public');
-                $validated['profile_photo'] = basename($path);
+                // if ($profile->profile_photo)
+                //     $this->imageUploadService->deleteImage($profile->profile_photo, 'images/profile_photos');
+                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo'), $profile->profile_photo);
+                $validated['profile_photo'] = $filename;
             }
 
             $profile->update($validated);

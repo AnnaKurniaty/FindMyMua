@@ -30,14 +30,15 @@ class Service extends Model
 
     public function getServicePhotoUrlAttribute()
     {
-        if ($this->photo) {
-            // If photo contains full URL, return as is
-            if (str_starts_with($this->photo, 'http')) {
-                return $this->photo;
-            }
-            // Otherwise, construct the storage URL with images folder
-            return asset('storage/images/service_photos/' . $this->photo);
+        if ($this->attributes['photo']) {
+            $supabaseBaseUrl = env('SUPABASE_STORAGE_URL', 'https://fqnrwqaaehzkypgfjdii.supabase.co/storage/v1/object/public/images/service_photos');
+
+            return $supabaseBaseUrl . '/' . ltrim($this->attributes['photo'], '/');
         }
-        return null;
+
+        $defaultAvatar = 'default-service.jpeg';
+        $supabaseBaseUrl = env('SUPABASE_STORAGE_URL', 'https://fqnrwqaaehzkypgfjdii.supabase.co/storage/v1/object/public/images');
+
+        return $supabaseBaseUrl . '/' . $defaultAvatar;
     }
 }
