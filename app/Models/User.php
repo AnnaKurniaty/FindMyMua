@@ -18,7 +18,7 @@ class User extends Authenticatable
 
     public function getProfilePhotoUrlAttribute()
     {
-        if (!$this->muaProfile && !$this->muaProfile->profile_photo) {
+        if (!$this->muaProfile) {
             $defaultAvatar = 'default-avatar.jpeg';
             $supabaseBaseUrl = env('SUPABASE_STORAGE_URL', 'https://fqnrwqaaehzkypgfjdii.supabase.co/storage/v1/object/public/images');
 
