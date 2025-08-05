@@ -60,7 +60,7 @@ class ProfileController extends Controller
                 'available_days' => 'nullable', // Can be string or array
                 'available_start_time' => 'nullable|date_format:H:i:s',
                 'available_end_time' => 'nullable|date_format:H:i:s',
-                'profile_photo' => 'nullable|image|max:2048',
+                'profile_photo' => 'nullable|image|max:5048',
             ]);
 
             $data = $request->only([
@@ -166,9 +166,10 @@ class ProfileController extends Controller
 
             // ✅ Handle profile photo upload
             if ($request->hasFile('profile_photo')) {
-                // if ($profile->profile_photo)
-                //     $this->imageUploadService->deleteImage($profile->profile_photo, 'images/profile_photos');
-                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo'), $profile->profile_photo);
+                if ($profile->profile_photo)
+                    $this->imageUploadService->deleteImage($profile->profile_photo, 'images/profile_photos');
+
+                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo'));
                 $validated['profile_photo'] = $filename;
             }
 

@@ -77,7 +77,11 @@ class ServiceController extends Controller
         $data = $request->only(['name', 'description', 'price', 'duration', 'makeup_style', 'category']);
 
         if ($request->hasFile('photo')) {
-            $filename = $this->imageUploadService->uploadServicePhoto($request->file('photo'), $service->photo);
+            if ($service->photo) {
+                $this->imageUploadService->deleteImage($service->photo, 'images/service_photos');
+            }
+
+            $filename = $this->imageUploadService->uploadServicePhoto($request->file('photo'));
             $data['photo'] = $filename;
         }
 

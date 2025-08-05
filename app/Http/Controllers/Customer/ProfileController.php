@@ -100,7 +100,11 @@ class ProfileController extends Controller
             // Handle profile photo upload to S3
             if ($request->hasFile('profile_photo')) {
                 // Delete old photo if exists
-                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo'), $profile->profile_photo);
+                if ($profile->profile_photo) {
+                    $this->imageUploadService->deleteImage($profile->profile_photo, 'images/profile_photos');
+                }
+
+                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo'));
                 $validated['profile_photo'] = $filename;
             }
 

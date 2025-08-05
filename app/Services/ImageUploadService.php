@@ -37,7 +37,7 @@ class ImageUploadService
 
         // Delete old photo if exists
         if ($oldPhoto) {
-            $this->deleteImage($oldPhoto);
+            $this->deleteImage($oldPhoto, $folder);
         }
 
         // Generate unique filename
@@ -93,22 +93,22 @@ class ImageUploadService
     {
         // Determine folder based on filename patterns
         if (strpos($filename, 'profile_') === 0) {
-            return 'images/profile_photos/' . $filename;
+            return 'profile_photos/' . $filename;
         }
 
         if (strpos($filename, 'service_') === 0) {
-            return 'images/service_photos/' . $filename;
+            return 'service_photos/' . $filename;
         }
 
         if (strpos($filename, 'portfolio_') === 0) {
-            return 'images/portfolio/' . $filename;
+            return 'portfolio/' . $filename;
         }
 
         if (strpos($filename, 'payment_') === 0) {
-            return 'images/payment_proofs/' . $filename;
+            return 'payment_proofs/' . $filename;
         }
 
-        return 'images/' . $filename;
+        return '/' . $filename;
     }
 
     /**
