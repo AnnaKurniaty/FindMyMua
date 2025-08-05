@@ -35,8 +35,8 @@ class Service extends Model
             if (str_starts_with($this->photo, 'http')) {
                 return $this->photo;
             }
-            // Otherwise, construct the storage URL
-            return asset('storage/service_photos/' . $this->photo);
+            // Otherwise, construct the storage URL with images folder
+            return asset('storage/images/service_photos/' . $this->photo);
         }
         return null;
     }
