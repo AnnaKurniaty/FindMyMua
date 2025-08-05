@@ -5,20 +5,27 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
+// Optional: CORS headers (gunakan middleware jika produksi)
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-// Determine if the application is in maintenance mode...
+// Maintenance mode check
 if (file_exists($maintenance = __DIR__ . '/../storage/framework/maintenance.php')) {
     require $maintenance;
 }
 
-// Register the Composer autoloader...
+// Composer autoload
 require __DIR__ . '/../vendor/autoload.php';
 
-// Bootstrap Laravel and handle the request...
-/** @var Application $app */
+// Bootstrap Laravel
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-$app->handleRequest(Request::capture());
+// Handle request via HTTP kernel
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+
+$response = $kernel->handle(
+    $request = Request::capture()
+)->send();
+
+$kernel->terminate($request, $response);
