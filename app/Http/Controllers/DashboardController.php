@@ -134,61 +134,20 @@ class DashboardController extends Controller
         ]);
     }
 
-    /**
-     * Get all MUA profiles for dashboard
-     */
-    public function mua(Request $request)
+    public function getAllMuaWithProfile(Request $request)
     {
-        $style     = $request->query('style');
-        $spec      = $request->query('specialization');
-        $minPrice  = $request->query('min_price');
-        $maxPrice  = $request->query('max_price');
-        $customerSkinTypes = $request->query('skin_types');
-        $customerStyles = $request->query('styles');
-        $limit = $request->query('limit', 20);
-
-        $query = MuaProfile::query()
-            ->with(['user', 'user.services', 'user.portfolios']);
-
-        if ($style) {
-            $query->whereJsonContains('makeup_styles', $style);
-        }
-
-        if ($spec) {
-            $query->whereJsonContains('makeup_specializations', $spec);
-        }
-
-        if ($minPrice || $maxPrice) {
-            $query->whereHas('user.services', function ($q) use ($minPrice, $maxPrice) {
-                if ($minPrice) $q->where('price', '>=', $minPrice);
-                if ($maxPrice) $q->where('price', '<=', $maxPrice);
-            });
-        }
-
-        if ($customerSkinTypes) {
-            $skinTypes = is_array($customerSkinTypes) ? $customerSkinTypes : explode(',', $customerSkinTypes);
-            $query->where(function($q) use ($skinTypes) {
-                foreach ($skinTypes as $skinType) {
-                    $q->orWhereJsonContains('skin_type', trim($skinType));
-                }
-            });
-        }
-
-        if ($customerStyles) {
-            $styles = is_array($customerStyles) ? $customerStyles : explode(',', $customerStyles);
-            $query->where(function($q) use ($styles) {
-                foreach ($styles as $style) {
-                    $q->orWhereJsonContains('makeup_styles', trim($style));
-                }
-            });
-        }
-
-        $results = $query->limit($limit)->get();
+        $muaUsers = User::where('role', 'mua')
+            ->whereHas('muaProfile')
+            ->with([
+                'muaProfile',
+                'services',
+                'portfolios'
+            ])
+            ->get();
 
         return response()->json([
-            'message' => 'MUAs retrieved successfully',
-            'data' => $results,
-            'total' => $results->count()
+            'message' => 'MUA users retrieved successfully',
+            'data' => $muaUsers
         ]);
     }
 }

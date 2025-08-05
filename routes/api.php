@@ -72,6 +72,7 @@ Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
 Route::prefix('dashboard')->group(function () {
     Route::get('/mua/search', [DashboardController::class, 'index']);
     Route::get('/mua', [DashboardController::class, 'mua']);
+    Route::get('/mua-users', [DashboardController::class, 'getAllMuaWithProfile']);
 });
 Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
     Route::get('/bookings', [CustomerBookingController::class, 'index']);
@@ -79,7 +80,6 @@ Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
     Route::get('/bookings/{id}', [CustomerBookingController::class, 'show']);
     Route::put('/bookings/{id}', [CustomerBookingController::class, 'update']);
 });
-
 Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
     Route::get('/bookings', [MuaBookingController::class, 'index']);
     Route::get('/bookings/summary', [MuaBookingController::class, 'summary']);

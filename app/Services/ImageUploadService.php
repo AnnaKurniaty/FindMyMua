@@ -32,6 +32,9 @@ class ImageUploadService
     
     private function uploadImage(UploadedFile $file, $folder, $oldPhoto = null)
     {
+        // Validate AWS configuration
+        $this->validateS3Configuration();
+        
         // Delete old photo if exists
         if ($oldPhoto) {
             $this->deleteImage($oldPhoto);
@@ -40,10 +43,13 @@ class ImageUploadService
         // Generate unique filename
         $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
         
-        // Store file
-        $path = $file->storeAs($folder, $filename, $this->disk);
-        
-        return basename($path);
+        try {
+            // Store file
+            $path = $file->storeAs($folder, $filename, $this->disk);
+            return basename($path);
+        } catch (Exception $e) {
+            throw new Exception("Failed to upload image to S3: " . $e->getMessage());
+        }
     }
     
     public function deleteImage($filename, $folder = null)
@@ -103,5 +109,34 @@ class ImageUploadService
         }
         
         return 'images/' . $filename;
+    }
+    
+    /**
+     * Validate S3 configuration
+     *
+     * @throws Exception
+     */
+    private function validateS3Configuration()
+    {
+        $bucket = config('filesystems.disks.s3.bucket');
+        $key = config('filesystems.disks.s3.key');
+        $secret = config('filesystems.disks.s3.secret');
+        $region = config('filesystems.disks.s3.region');
+        
+        if (empty($bucket)) {
+            throw new Exception('AWS_BUCKET environment variable is not set or empty. Please configure your AWS S3 bucket name.');
+        }
+        
+        if (empty($key)) {
+            throw new Exception('AWS_ACCESS_KEY_ID environment variable is not set or empty.');
+        }
+        
+        if (empty($secret)) {
+            throw new Exception('AWS_SECRET_ACCESS_KEY environment variable is not set or empty.');
+        }
+        
+        if (empty($region)) {
+            throw new Exception('AWS_DEFAULT_REGION environment variable is not set or empty.');
+        }
     }
 }
