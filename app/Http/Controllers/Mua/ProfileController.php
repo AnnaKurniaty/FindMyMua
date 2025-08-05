@@ -159,13 +159,13 @@ class ProfileController extends Controller
                         'is_string' => is_string($validated[$field]),
                         'is_array' => is_array($validated[$field]),
                     ]);
-
+                    
                     // If it's already an array, keep as is (model will handle JSON conversion)
                     if (is_array($validated[$field])) {
                         \Log::info("Field $field is already an array, keeping as is", ['array' => $validated[$field]]);
                         continue;
                     }
-
+                    
                     // If it's a string, check if it's already JSON
                     if (is_string($validated[$field])) {
                         // Check if it's already a JSON array string
@@ -185,7 +185,7 @@ class ProfileController extends Controller
                             // If it's not JSON, treat as comma-separated or single value
                             $parsed = array_map('trim', explode(',', $validated[$field]));
                             // Remove empty values
-                            $parsed = array_filter($parsed, function ($value) {
+                            $parsed = array_filter($parsed, function($value) {
                                 return $value !== '' && $value !== '""';
                             });
                             $validated[$field] = array_values($parsed);
@@ -223,6 +223,7 @@ class ProfileController extends Controller
                 'message' => 'Profile updated successfully',
                 'data' => $user
             ], 200);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'message' => 'Validation failed',

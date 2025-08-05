@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
@@ -28,7 +27,7 @@ class BookingController extends Controller
         ]);
 
         $customerProfile = Auth::user()->customerProfile;
-
+        
         // Ambil service untuk mendapatkan harga
         $service = \App\Models\Service::findOrFail($request->service_id);
 
@@ -102,11 +101,11 @@ class BookingController extends Controller
 
         // Periksa apakah ini adalah request method spoofing (POST dengan _method=PUT)
         $isSpoofedPut = $request->input('_method') === 'PUT';
-
+        
         // Jika request adalah untuk update payment method dan payment proof
         // Periksa apakah ada data yang dikirim dengan FormData
         $hasPaymentData = $request->has('payment_method') || $request->hasFile('payment_proof') || $request->isMethod('post') || $isSpoofedPut;
-
+        
         if ($hasPaymentData) {
             // Update payment method jika ada
             if ($request->has('payment_method')) {

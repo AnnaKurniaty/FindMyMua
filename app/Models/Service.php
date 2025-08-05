@@ -36,7 +36,7 @@ class Service extends Model
                 return $this->photo;
             }
             // Otherwise, construct the storage URL
-            return asset('storage/images/service_photos/' . $this->photo);
+            return asset('storage/service_photos/' . $this->photo);
         }
         return null;
     }
