@@ -12,22 +12,22 @@ class ImageUploadService
 
     public function uploadProfilePhoto(UploadedFile $file, $oldPhoto = null)
     {
-        return $this->uploadImage($file, 'images/profile_photos', $oldPhoto);
+        return $this->uploadImage($file, 'profile_photos', $oldPhoto);
     }
 
     public function uploadServicePhoto(UploadedFile $file, $oldPhoto = null)
     {
-        return $this->uploadImage($file, 'images/service_photos', $oldPhoto);
+        return $this->uploadImage($file, 'service_photos', $oldPhoto);
     }
 
     public function uploadPortfolioImage(UploadedFile $file, $oldPhoto = null)
     {
-        return $this->uploadImage($file, 'images/portfolio', $oldPhoto);
+        return $this->uploadImage($file, 'portfolio', $oldPhoto);
     }
 
     public function uploadPaymentProof(UploadedFile $file, $oldPhoto = null)
     {
-        return $this->uploadImage($file, 'images/payment_proofs', $oldPhoto);
+        return $this->uploadImage($file, 'payment_proofs', $oldPhoto);
     }
 
     private function uploadImage(UploadedFile $file, $folder, $oldPhoto = null)
