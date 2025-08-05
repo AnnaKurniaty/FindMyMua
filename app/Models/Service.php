@@ -31,8 +31,7 @@ class Service extends Model
     public function getServicePhotoUrlAttribute()
     {
         if ($this->attributes['photo']) {
-            $supabaseBaseUrl = env('SUPABASE_STORAGE_URL', 'https://fqnrwqaaehzkypgfjdii.supabase.co/storage/v1/object/public/images/service_photos');
-
+            $supabaseBaseUrl = rtrim(env('SUPABASE_STORAGE_URL', 'https://fqnrwqaaehzkypgfjdii.supabase.co/storage/v1/object/public/images/service_photos'), '/') . '/service_photos';
             return $supabaseBaseUrl . '/' . ltrim($this->attributes['photo'], '/');
         }
 
