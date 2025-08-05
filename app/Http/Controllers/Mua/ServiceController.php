@@ -40,7 +40,7 @@ class ServiceController extends Controller
         $data['mua_id'] = Auth::id();
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('images/service_photos', 'public');
+            $path = $request->file('photo')->store('service_photos', 'public');
             $data['photo'] = basename($path);
         }
 
@@ -69,7 +69,7 @@ class ServiceController extends Controller
         $data = $request->only(['name', 'description', 'price', 'duration', 'makeup_style', 'category']);
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('images/service_photos', 'public');
+            $path = $request->file('photo')->store('service_photos', 'public');
             $data['photo'] = basename($path);
         }
 
@@ -92,22 +92,22 @@ class ServiceController extends Controller
     public function analytics()
     {
         $muaId = Auth::id();
-        
+
         // Total Bookings (completed only)
         $totalBookings = Booking::where('bookings.mua_id', $muaId)
             ->where('status', 'completed')
             ->count();
-        
+
         // Total Revenue (from completed bookings only)
         $totalRevenue = Booking::where('bookings.mua_id', $muaId)
             ->where('status', 'completed')
             ->sum('total_price');
-        
+
         // Average Rating (from reviews of this MUA's bookings)
-        $averageRating = Review::whereHas('booking', function($query) use ($muaId) {
+        $averageRating = Review::whereHas('booking', function ($query) use ($muaId) {
             $query->where('bookings.mua_id', $muaId);
         })->avg('rating');
-        
+
         // Most Popular Category (most booked category from completed bookings)
         $mostPopularCategory = Booking::where('bookings.mua_id', $muaId)
             ->where('status', 'completed')
@@ -116,7 +116,7 @@ class ServiceController extends Controller
             ->groupBy('services.category')
             ->orderBy('booking_count', 'desc')
             ->first();
-        
+
         return response()->json([
             'total_bookings' => $totalBookings,
             'total_revenue' => $totalRevenue ?: 0,

@@ -24,10 +24,10 @@ class ProfileController extends Controller
     {
         try {
             $user = Auth::user();
-            
+
             // Cek apakah CustomerProfile sudah ada dengan relasi user
             $profile = CustomerProfile::with('user')->where('user_id', $user->id)->first();
-            
+
             if (!$profile) {
                 // Buat CustomerProfile baru jika belum ada
                 $profile = CustomerProfile::create([
@@ -41,13 +41,13 @@ class ProfileController extends Controller
                     'makeup_preferences' => [],
                     'profile_photo' => null
                 ]);
-                
+
                 Log::info('CustomerProfile created for user: ' . $user->id);
             }
 
             // Add S3 URL for profile photo
             if ($profile->profile_photo) {
-                $profile->profile_photo_url = $this->imageUploadService->getImageUrl($profile->profile_photo, 'images/profile_photos');
+                $profile->profile_photo_url = $this->imageUploadService->getImageUrl($profile->profile_photo, 'profile_photos');
             } else {
                 $profile->profile_photo_url = null;
             }
@@ -63,7 +63,6 @@ class ProfileController extends Controller
                 'profile' => $profileData,
                 'message' => 'Profile data retrieved successfully'
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error retrieving customer profile: ' . $e->getMessage());
             return response()->json([
@@ -102,10 +101,10 @@ class ProfileController extends Controller
             if ($request->hasFile('profile_photo')) {
                 // Delete old photo if exists
                 if ($profile->profile_photo) {
-                    $this->imageUploadService->deleteImage($profile->profile_photo, 'images/profile_photos');
+                    $this->imageUploadService->deleteImage($profile->profile_photo, 'profile_photos');
                 }
-                
-                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo'));
+
+                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo')->store('profile_photos', 'public'));
                 $validated['profile_photo'] = $filename;
             }
 
@@ -128,7 +127,7 @@ class ProfileController extends Controller
 
             // Refresh profile with photo URL
             if ($profile->profile_photo) {
-                $profile->profile_photo_url = $this->imageUploadService->getImageUrl($profile->profile_photo, 'images/profile_photos');
+                $profile->profile_photo_url = $this->imageUploadService->getImageUrl($profile->profile_photo, 'profile_photos');
             }
 
             return response()->json([
@@ -136,7 +135,6 @@ class ProfileController extends Controller
                 'message' => 'Profile updated successfully',
                 'profile' => $profile
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error updating customer profile: ' . $e->getMessage());
             return response()->json([

@@ -39,7 +39,7 @@ class MuaProfile extends Model
     {
         return $this->attributes['profile_photo']
             ? asset('storage/profile_photos/' . $this->attributes['profile_photo'])
-            : asset('images/default-avatar.png');
+            : asset('storage/default-avatar.png');
     }
 
     public function user()
