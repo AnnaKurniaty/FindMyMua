@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -17,7 +18,7 @@ class CustomerAuthController extends Controller
     {
         $this->imageUploadService = $imageUploadService;
     }
-    
+
     public function register(Request $request)
     {
         try {
@@ -26,7 +27,7 @@ class CustomerAuthController extends Controller
             $email = $request->input('email') ?? $request->email;
             $phone = $request->input('phone') ?? $request->phone;
             $password = $request->input('password') ?? $request->password;
-            
+
             $request->validate([
                 'name'     => 'required|string',
                 'email'    => 'required|email|unique:users',
@@ -79,7 +80,7 @@ class CustomerAuthController extends Controller
                     // If it's an array, keep as is
                 }
             }
-            
+
             // Ensure empty arrays are properly handled
             foreach ($jsonFields as $field) {
                 if (isset($profileData[$field]) && is_array($profileData[$field]) && empty($profileData[$field])) {
@@ -90,7 +91,7 @@ class CustomerAuthController extends Controller
             // Handle profile photo upload
             $profilePhotoUrl = null;
             if ($request->hasFile('profile_photo')) {
-                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo'));
+                $filename = $this->imageUploadService->uploadProfilePhoto($request->file('profile_photo')->store('profile_photos', 'public'));
                 $profileData['profile_photo'] = $filename;
                 $profilePhotoUrl = $this->imageUploadService->getImageUrl($filename, 'images/profile_photos');
             }

@@ -38,7 +38,7 @@ class MuaProfile extends Model
     public function getProfilePhotoUrlAttribute()
     {
         return $this->attributes['profile_photo']
-            ? asset('storage/profile_photos/' . $this->attributes['profile_photo'])
+            ? asset('storage/images/profile_photos/' . $this->attributes['profile_photo'])
             : asset('images/default-avatar.png');
     }
 
