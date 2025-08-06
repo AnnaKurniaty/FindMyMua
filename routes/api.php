@@ -19,7 +19,6 @@ use App\Http\Controllers\AvailabilityController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Customer\BookingPaymentController;
-use App\Http\Controllers\MidtransCallbackController;
 use App\Http\Controllers\Mua\ReportController;
 
 use Fruitcake\Cors\HandleCors;
@@ -85,6 +84,7 @@ Route::middleware(['auth:sanctum'])->prefix('mua')->group(function () {
     Route::get('/bookings/summary', [MuaBookingController::class, 'summary']);
     Route::put('/bookings/{id}/status', [MuaBookingController::class, 'updateStatus']);
     Route::put('/bookings/{id}', [MuaBookingController::class, 'update']);
+    Route::get('/bookings/{id}/customer-detail', [MuaBookingController::class, 'getCustomerDetail']);
 });
 
 Route::middleware(['auth:sanctum'])->prefix('customer')->group(function () {
@@ -134,8 +134,6 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/booking/{id}/pay', [BookingPaymentController::class, 'pay']);
 });
-
-Route::post('/midtrans/callback', [MidtransCallbackController::class, 'handle']);
 
 // Blocked time slots
 Route::middleware(['auth:sanctum'])->prefix('blocked-slots')->group(function () {

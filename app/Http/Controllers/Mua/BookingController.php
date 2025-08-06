@@ -64,6 +64,44 @@ class BookingController extends Controller
         ]);
     }
 
+    public function getCustomerDetail($id)
+    {
+        $booking = Booking::where('id', $id)
+            ->where('mua_id', Auth::id())
+            ->with(['customer', 'customer.customerProfile'])
+            ->firstOrFail();
+
+        // Get customer profile photo URL
+        $profilePhotoUrl = null;
+        if ($booking->customer->customerProfile && $booking->customer->customerProfile->profile_photo) {
+            $supabaseBaseUrl = rtrim(env('SUPABASE_STORAGE_URL', 'https://fqnrwqaaehzkypgfjdii.supabase.co/storage/v1/object/public/images'), '/') . '/profile_photos';
+            $profilePhotoUrl = $supabaseBaseUrl . '/' . ltrim($booking->customer->customerProfile->profile_photo, '/');
+        } else {
+            // Use default avatar
+            $supabaseBaseUrl = env('SUPABASE_STORAGE_URL', 'https://fqnrwqaaehzkypgfjdii.supabase.co/storage/v1/object/public/images');
+            $profilePhotoUrl = $supabaseBaseUrl . '/default-avatar.jpg';
+        }
+
+        return response()->json([
+            'id' => $booking->customer->id,
+            'name' => $booking->customer->name,
+            'email' => $booking->customer->email,
+            'phone' => $booking->customer->customerProfile->phone ?? '',
+            'address' => $booking->customer->customerProfile->address ?? '',
+            'style' => $booking->customer->customerProfile->style ?? '',
+            'profile_photo_url' => $profilePhotoUrl,
+            'payment_proof_url' => $booking->payment_proof_url ?? '',
+            'booking_details' => [
+                'service' => $booking->service->name,
+                'date' => $booking->date,
+                'time' => $booking->time,
+                'total_price' => $booking->total_price,
+                'status' => $booking->status,
+                'payment_status' => $booking->payment_status
+            ]
+        ]);
+    }
+
     public function updateStatus(Request $request, $id)
     {
         $booking = Booking::where('id', $id)->where('mua_id', Auth::id())->firstOrFail();

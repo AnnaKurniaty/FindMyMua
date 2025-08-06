@@ -34,4 +34,16 @@ class Booking extends Model
     {
         return $this->hasOne(Review::class);
     }
+
+    protected $appends = ['payment_proof_url'];
+
+    public function getPaymentProofUrlAttribute()
+    {
+        if ($this->payment_proof) {
+            $supabaseBaseUrl = rtrim(env('SUPABASE_STORAGE_URL', 'https://fqnrwqaaehzkypgfjdii.supabase.co/storage/v1/object/public/images'), '/') . '/payment_proofs';
+            return $supabaseBaseUrl . '/' . ltrim($this->payment_proof, '/');
+        }
+
+        return null;
+    }
 }
