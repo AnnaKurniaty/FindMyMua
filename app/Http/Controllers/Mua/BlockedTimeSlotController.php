@@ -58,7 +58,7 @@ class BlockedTimeSlotController extends Controller
     {
         $request->validate([
             'date' => 'required|date',
-            'reason' => 'required|string|max:255',
+            'reason' => 'string|max:255',
             'is_full_day' => 'boolean'
         ]);
 
@@ -85,7 +85,7 @@ class BlockedTimeSlotController extends Controller
         
         $request->validate([
             'date' => 'required|date',
-            'reason' => 'required|string|max:255',
+            'reason' => 'string|max:255',
             'is_full_day' => 'boolean'
         ]);
 
