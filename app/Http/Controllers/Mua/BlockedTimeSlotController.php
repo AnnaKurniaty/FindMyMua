@@ -14,21 +14,13 @@ class BlockedTimeSlotController extends Controller
      */
     public function index(Request $request)
     {
-        $startDate = $request->query('start_date');
-        $endDate = $request->query('end_date');
         
         $query = BlockedTimeSlot::where('mua_id', Auth::id());
-        
-        if ($startDate && $endDate) {
-            $query->whereBetween('date', [$startDate, $endDate]);
-        }
         
         $blockedSlots = $query->get()->map(function ($slot) {
             return [
                 'id' => $slot->id,
                 'date' => $slot->date,
-                'start_time' => $slot->start_time,
-                'end_time' => $slot->end_time,
                 'reason' => $slot->reason,
                 'is_full_day' => $slot->is_full_day
             ];
@@ -42,20 +34,12 @@ class BlockedTimeSlotController extends Controller
      */
     public function getBlockedSlots($muaId, Request $request)
     {
-        $startDate = $request->query('start_date');
-        $endDate = $request->query('end_date');
         
         $query = BlockedTimeSlot::where('mua_id', $muaId);
-        
-        if ($startDate && $endDate) {
-            $query->whereBetween('date', [$startDate, $endDate]);
-        }
         
         $blockedSlots = $query->get()->map(function ($slot) {
             return [
                 'date' => $slot->date,
-                'start_time' => $slot->start_time,
-                'end_time' => $slot->end_time,
                 'reason' => $slot->reason,
                 'is_full_day' => $slot->is_full_day
             ];
@@ -74,8 +58,6 @@ class BlockedTimeSlotController extends Controller
     {
         $request->validate([
             'date' => 'required|date',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
             'reason' => 'required|string|max:255',
             'is_full_day' => 'boolean'
         ]);
@@ -83,8 +65,6 @@ class BlockedTimeSlotController extends Controller
         $blockedSlot = BlockedTimeSlot::create([
             'mua_id' => Auth::id(),
             'date' => $request->date,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
             'reason' => $request->reason,
             'is_full_day' => $request->is_full_day ?? false
         ]);
@@ -105,16 +85,12 @@ class BlockedTimeSlotController extends Controller
         
         $request->validate([
             'date' => 'required|date',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
             'reason' => 'required|string|max:255',
             'is_full_day' => 'boolean'
         ]);
 
         $blockedSlot->update([
             'date' => $request->date,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
             'reason' => $request->reason,
             'is_full_day' => $request->is_full_day ?? false
         ]);

@@ -12,8 +12,6 @@ class BlockedTimeSlot extends Model
     protected $fillable = [
         'mua_id',
         'date',
-        'start_time',
-        'end_time',
         'full_day',
         'reason',
     ];
