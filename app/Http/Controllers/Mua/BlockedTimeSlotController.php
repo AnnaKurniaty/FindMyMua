@@ -62,6 +62,19 @@ class BlockedTimeSlotController extends Controller
             'is_full_day' => 'boolean'
         ]);
 
+        // Check if the date is already blocked for this MUA
+        $existingBlock = BlockedTimeSlot::where('mua_id', Auth::id())
+            ->where('date', $request->date)
+            ->first();
+
+        if ($existingBlock) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This date is already blocked for your profile',
+                'data' => $existingBlock
+            ], 422);
+        }
+
         $blockedSlot = BlockedTimeSlot::create([
             'mua_id' => Auth::id(),
             'date' => $request->date,
