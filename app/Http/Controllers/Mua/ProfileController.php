@@ -58,8 +58,8 @@ class ProfileController extends Controller
                 'makeup_specializations' => 'nullable', // Can be string or array
                 'skin_type' => 'nullable', // Can be string or array
                 'available_days' => 'nullable', // Can be string or array
-                'available_start_time' => 'nullable|date_format:H:i:s',
-                'available_end_time' => 'nullable|date_format:H:i:s',
+                'available_start_time' => 'nullable',
+                'available_end_time' => 'nullable',
                 'profile_photo' => 'nullable|image|max:5048',
             ]);
 
