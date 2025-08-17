@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class BlockedTimeSlotController extends Controller
 {
-    /**
-     * Get all blocked time slots for the authenticated MUA
-     */
     public function index(Request $request)
     {
         
@@ -29,9 +26,6 @@ class BlockedTimeSlotController extends Controller
         return response()->json($blockedSlots);
     }
 
-    /**
-     * Get blocked time slots for a specific MUA (public endpoint)
-     */
     public function getBlockedSlots($muaId, Request $request)
     {
         
@@ -51,9 +45,6 @@ class BlockedTimeSlotController extends Controller
         ]);
     }
 
-    /**
-     * Create a new blocked time slot
-     */
     public function store(Request $request)
     {
         $request->validate([
